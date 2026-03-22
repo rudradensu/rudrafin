@@ -18,14 +18,23 @@ Want to say thanks? Click the ⭐ at the top of the page.
 
 ## Installation
 
-There are four ways to deploy Actual:
+There are several ways to deploy Actual:
 
 1. One-click deployment [via PikaPods](https://www.pikapods.com/pods?run=actual) (~1.40 $/month) - recommended for non-technical users
 1. Managed hosting [via Fly.io](https://actualbudget.org/docs/install/fly) (~1.50 $/month)
-1. Self-hosted by using [a Docker image](https://actualbudget.org/docs/install/docker)
+1. Self-hosted using [a single Docker container](https://actualbudget.org/docs/install/docker)
+1. Self-hosted using a [two-container Docker Compose setup](./docker-compose.split.yml) — separates the database from the application
 1. Local-only apps - [downloadable Windows, Mac and Linux apps](https://actualbudget.org/download/) you can run on your device
 
-Learn more in the [installation instructions docs](https://actualbudget.org/docs/install/).
+See [INSTALLATION.md](./INSTALLATION.md) for a full packaging and installation guide, including the two-container setup.
+
+## Documentation
+
+| Guide | Description |
+|---|---|
+| [INSTALLATION.md](./INSTALLATION.md) | Packaging and installation (all deployment options) |
+| [DEVELOPER_GUIDE.md](./DEVELOPER_GUIDE.md) | Code walkthrough and workflow for new contributors |
+| [TESTING_GUIDE.md](./TESTING_GUIDE.md) | How to run and write automated tests |
 
 ## Ready to Start Budgeting?
 
