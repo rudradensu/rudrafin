@@ -32,9 +32,11 @@ See [INSTALLATION.md](./INSTALLATION.md) for a full packaging and installation g
 
 | Guide | Description |
 |---|---|
+| [NEW_DEVELOPER_ONBOARDING.md](./NEW_DEVELOPER_ONBOARDING.md) | **Start here** — full onboarding guide for new developers (code layout, code flow, build, test, deploy) |
 | [INSTALLATION.md](./INSTALLATION.md) | Packaging and installation (all deployment options) |
 | [DEVELOPER_GUIDE.md](./DEVELOPER_GUIDE.md) | Code walkthrough and workflow for new contributors |
 | [TESTING_GUIDE.md](./TESTING_GUIDE.md) | How to run and write automated tests |
+| [wiki/](./wiki/) | Deep-dive pages for each developer topic |
 
 ## Ready to Start Budgeting?
 
