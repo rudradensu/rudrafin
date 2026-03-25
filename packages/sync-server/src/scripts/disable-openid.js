@@ -5,14 +5,14 @@ import {
 } from '../account-db';
 import { promptPassword } from '../util/prompt';
 
-if (needsBootstrap()) {
+if (await needsBootstrap()) {
   console.log('System needs to be bootstrapped first. OpenID is not enabled.');
 
   process.exit(1);
 } else {
   console.log('To disable OpenID, you have to enter your server password:');
   try {
-    const loginMethod = getActiveLoginMethod();
+    const loginMethod = await getActiveLoginMethod();
     console.log(`Current login method: ${loginMethod}`);
 
     if (loginMethod === 'password') {

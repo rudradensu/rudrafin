@@ -298,6 +298,16 @@ const configSchema = convict({
       env: 'ACTUAL_CORS_PROXY_ENABLED',
     },
   },
+
+  postgres: {
+    doc: 'PostgreSQL configuration.',
+    url: {
+      doc: 'PostgreSQL connection URL',
+      format: String,
+      default: 'postgresql://actual:actual@db:5432/actual',
+      env: 'ACTUAL_POSTGRES_URL',
+    },
+  },
 });
 
 let configPath = null;

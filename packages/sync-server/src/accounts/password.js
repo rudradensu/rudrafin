@@ -13,17 +13,17 @@ function hashPassword(password) {
   return bcrypt.hashSync(password, 12);
 }
 
-export function bootstrapPassword(password) {
+export async function bootstrapPassword(password) {
   if (!isValidPassword(password)) {
     return { error: 'invalid-password' };
   }
 
   const hashed = hashPassword(password);
   const accountDb = getAccountDb();
-  accountDb.transaction(() => {
-    accountDb.mutate('DELETE FROM auth WHERE method = ?', ['password']);
-    accountDb.mutate('UPDATE auth SET active = 0');
-    accountDb.mutate(
+  await accountDb.transaction(async txDb => {
+    await txDb.mutate('DELETE FROM auth WHERE method = ?', ['password']);
+    await txDb.mutate('UPDATE auth SET active = 0');
+    await txDb.mutate(
       "INSERT INTO auth (method, display_name, extra_data, active) VALUES ('password', 'Password', ?, 1)",
       [hashed],
     );
@@ -32,16 +32,16 @@ export function bootstrapPassword(password) {
   return {};
 }
 
-export function loginWithPassword(password) {
+export async function loginWithPassword(password) {
   if (!isValidPassword(password)) {
     return { error: 'invalid-password' };
   }
 
   const accountDb = getAccountDb();
-  const { extra_data: passwordHash } =
-    accountDb.first('SELECT extra_data FROM auth WHERE method = ?', [
-      'password',
-    ]) || {};
+  const authRow = await accountDb.first('SELECT extra_data FROM auth WHERE method = ?', [
+    'password',
+  ]);
+  const passwordHash = authRow ? authRow.extra_data : undefined;
 
   if (!passwordHash) {
     return { error: 'invalid-password' };
@@ -53,30 +53,31 @@ export function loginWithPassword(password) {
     return { error: 'invalid-password' };
   }
 
-  const sessionRow = accountDb.first(
+  const sessionRow = await accountDb.first(
     'SELECT * FROM sessions WHERE auth_method = ?',
     ['password'],
   );
 
   const token = sessionRow ? sessionRow.token : uuidv4();
 
-  const { totalOfUsers } = accountDb.first(
-    'SELECT count(*) as totalOfUsers FROM users',
+  const usersRow = await accountDb.first(
+    'SELECT count(*) as "totalOfUsers" FROM users',
   );
+  const totalOfUsers = usersRow ? usersRow.totalOfUsers : 0;
   let userId = null;
   if (totalOfUsers === 0) {
     userId = uuidv4();
-    accountDb.mutate(
+    await accountDb.mutate(
       'INSERT INTO users (id, user_name, display_name, enabled, owner, role) VALUES (?, ?, ?, 1, 1, ?)',
       [userId, '', '', 'ADMIN'],
     );
   } else {
-    const { id: userIdFromDb } = accountDb.first(
+    const userRow = await accountDb.first(
       'SELECT id FROM users WHERE user_name = ?',
       [''],
     );
 
-    userId = userIdFromDb;
+    userId = userRow ? userRow.id : null;
 
     if (!userId) {
       return { error: 'user-not-found' };
@@ -94,23 +95,23 @@ export function loginWithPassword(password) {
   }
 
   if (!sessionRow) {
-    accountDb.mutate(
+    await accountDb.mutate(
       'INSERT INTO sessions (token, expires_at, user_id, auth_method) VALUES (?, ?, ?, ?)',
       [token, expiration, userId, 'password'],
     );
   } else {
-    accountDb.mutate(
+    await accountDb.mutate(
       'UPDATE sessions SET user_id = ?, expires_at = ? WHERE token = ?',
       [userId, expiration, token],
     );
   }
 
-  clearExpiredSessions();
+  await clearExpiredSessions();
 
   return { token };
 }
 
-export function changePassword(newPassword) {
+export async function changePassword(newPassword) {
   const accountDb = getAccountDb();
 
   if (!isValidPassword(newPassword)) {
@@ -118,22 +119,22 @@ export function changePassword(newPassword) {
   }
 
   const hashed = hashPassword(newPassword);
-  accountDb.mutate("UPDATE auth SET extra_data = ? WHERE method = 'password'", [
+  await accountDb.mutate("UPDATE auth SET extra_data = ? WHERE method = 'password'", [
     hashed,
   ]);
   return {};
 }
 
-export function checkPassword(password) {
+export async function checkPassword(password) {
   if (!isValidPassword(password)) {
     return false;
   }
 
   const accountDb = getAccountDb();
-  const { extra_data: passwordHash } =
-    accountDb.first('SELECT extra_data FROM auth WHERE method = ?', [
-      'password',
-    ]) || {};
+  const row = await accountDb.first('SELECT extra_data FROM auth WHERE method = ?', [
+    'password',
+  ]);
+  const passwordHash = row ? row.extra_data : undefined;
 
   if (!passwordHash) {
     return false;

@@ -1,13 +1,16 @@
 import { getAccountDb } from '../src/account-db';
 
 export const up = async function () {
-  await getAccountDb().exec(`
+  const accountDb = getAccountDb();
+  await accountDb.exec(`
     CREATE TABLE IF NOT EXISTS auth
-      (password TEXT PRIMARY KEY);
-
+      (password TEXT PRIMARY KEY)
+  `);
+  await accountDb.exec(`
     CREATE TABLE IF NOT EXISTS sessions
-      (token TEXT PRIMARY KEY);
-
+      (token TEXT PRIMARY KEY)
+  `);
+  await accountDb.exec(`
     CREATE TABLE IF NOT EXISTS files
       (id TEXT PRIMARY KEY,
        group_id TEXT,
@@ -16,15 +19,14 @@ export const up = async function () {
        encrypt_keyid TEXT,
        encrypt_salt TEXT,
        encrypt_test TEXT,
-       deleted BOOLEAN DEFAULT FALSE,
-       name TEXT);
+       deleted BOOLEAN DEFAULT false,
+       name TEXT)
   `);
 };
 
 export const down = async function () {
-  await getAccountDb().exec(`
-    DROP TABLE auth;
-    DROP TABLE sessions;
-    DROP TABLE files;
-  `);
+  const accountDb = getAccountDb();
+  await accountDb.exec(`DROP TABLE IF EXISTS auth`);
+  await accountDb.exec(`DROP TABLE IF EXISTS sessions`);
+  await accountDb.exec(`DROP TABLE IF EXISTS files`);
 };

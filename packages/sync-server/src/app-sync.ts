@@ -58,14 +58,11 @@ function boolToInt(deleted) {
   return deleted ? 1 : 0;
 }
 
-const verifyFileExists = (fileId, filesService, res, errorObject) => {
+const verifyFileExists = async (fileId, filesService, res, errorObject) => {
   try {
-    return filesService.get(fileId);
+    return await filesService.get(fileId);
   } catch (e) {
     if (e instanceof FileNotFound) {
-      //FIXME: error code should be 404. Need to make sure frontend is ok with it.
-      //TODO: put this into a middleware that checks if FileNotFound is thrown and returns 404 and same error message
-      // for every FileNotFound error
       res.status(400).send(errorObject);
       return;
     }
@@ -73,13 +70,13 @@ const verifyFileExists = (fileId, filesService, res, errorObject) => {
   }
 };
 
-function requireFileAccess(file: File, userId: string) {
+async function requireFileAccess(file: File, userId: string) {
   const isOwner = file.owner === userId;
-  const isServerAdmin = isAdmin(userId);
+  const isServerAdmin = await isAdmin(userId);
   if (isOwner || isServerAdmin) {
     return null;
   }
-  if (UserService.countUserAccess(file.id, userId) > 0) {
+  if ((await UserService.countUserAccess(file.id, userId)) > 0) {
     return null;
   }
   return 'file-access-not-allowed';
@@ -113,7 +110,7 @@ app.post('/sync', async (req, res): Promise<void> => {
 
   const filesService = new FilesService(getAccountDb());
 
-  const currentFile = verifyFileExists(
+  const currentFile = await verifyFileExists(
     fileId,
     filesService,
     res,
@@ -124,7 +121,7 @@ app.post('/sync', async (req, res): Promise<void> => {
     return;
   }
 
-  const fileAccessError = requireFileAccess(currentFile, res.locals.user_id);
+  const fileAccessError = await requireFileAccess(currentFile, res.locals.user_id);
   if (fileAccessError) {
     res.status(403);
     res.send(fileAccessError);
@@ -138,7 +135,7 @@ app.post('/sync', async (req, res): Promise<void> => {
     return;
   }
 
-  const { trie, newMessages } = simpleSync.sync(messages, since, groupId);
+  const { trie, newMessages } = await simpleSync.sync(messages, since, groupId);
 
   // encode it back...
   const responsePb = new SyncProtoBuf.SyncResponse();
@@ -150,19 +147,19 @@ app.post('/sync', async (req, res): Promise<void> => {
   res.send(Buffer.from(responsePb.serializeBinary()));
 });
 
-app.post('/user-get-key', (req, res) => {
+app.post('/user-get-key', async (req, res) => {
   if (!res.locals) return;
 
   const { fileId } = req.body || {};
 
   const filesService = new FilesService(getAccountDb());
-  const file = verifyFileExists(fileId, filesService, res, 'file-not-found');
+  const file = await verifyFileExists(fileId, filesService, res, 'file-not-found');
 
   if (!file) {
     return;
   }
 
-  const fileAccessError = requireFileAccess(file, res.locals.user_id);
+  const fileAccessError = await requireFileAccess(file, res.locals.user_id);
   if (fileAccessError) {
     res.status(403);
     res.send(fileAccessError);
@@ -179,24 +176,24 @@ app.post('/user-get-key', (req, res) => {
   });
 });
 
-app.post('/user-create-key', (req, res) => {
+app.post('/user-create-key', async (req, res) => {
   const { fileId, keyId, keySalt, testContent } = req.body || {};
 
   const filesService = new FilesService(getAccountDb());
-  const file = verifyFileExists(fileId, filesService, res, 'file-not-found');
+  const file = await verifyFileExists(fileId, filesService, res, 'file-not-found');
 
   if (!file) {
     return;
   }
 
-  const fileAccessError = requireFileAccess(file, res.locals.user_id);
+  const fileAccessError = await requireFileAccess(file, res.locals.user_id);
   if (fileAccessError) {
     res.status(403);
     res.send(fileAccessError);
     return;
   }
 
-  filesService.update(
+  await filesService.update(
     fileId,
     new FileUpdate({
       encryptSalt: keySalt,
@@ -212,7 +209,7 @@ app.post('/reset-user-file', async (req, res) => {
   const { fileId } = req.body || {};
 
   const filesService = new FilesService(getAccountDb());
-  const file = verifyFileExists(
+  const file = await verifyFileExists(
     fileId,
     filesService,
     res,
@@ -223,7 +220,7 @@ app.post('/reset-user-file', async (req, res) => {
     return;
   }
 
-  const fileAccessError = requireFileAccess(file, res.locals.user_id);
+  const fileAccessError = await requireFileAccess(file, res.locals.user_id);
   if (fileAccessError) {
     res.status(403);
     res.send(fileAccessError);
@@ -232,7 +229,7 @@ app.post('/reset-user-file', async (req, res) => {
 
   const groupId = file.groupId;
 
-  filesService.update(fileId, new FileUpdate({ groupId: null }));
+  await filesService.update(fileId, new FileUpdate({ groupId: null }));
 
   if (groupId) {
     try {
@@ -247,8 +244,6 @@ app.post('/reset-user-file', async (req, res) => {
 
 app.post('/upload-user-file', async (req, res) => {
   if (typeof req.headers['x-actual-name'] !== 'string') {
-    // FIXME: Not sure how this cannot be a string when the header is
-    // set.
     res.status(400).send('single x-actual-name is required');
     return;
   }
@@ -278,7 +273,7 @@ app.post('/upload-user-file', async (req, res) => {
   let currentFile;
 
   try {
-    currentFile = filesService.get(fileId);
+    currentFile = await filesService.get(fileId);
   } catch (e) {
     if (e instanceof FileNotFound) {
       currentFile = null;
@@ -288,7 +283,7 @@ app.post('/upload-user-file', async (req, res) => {
   }
 
   const fileAccessError = currentFile
-    ? requireFileAccess(currentFile, res.locals.user_id)
+    ? await requireFileAccess(currentFile, res.locals.user_id)
     : null;
   if (fileAccessError) {
     res.status(403);
@@ -314,7 +309,7 @@ app.post('/upload-user-file', async (req, res) => {
     // it's new
     groupId = uuidv4();
 
-    filesService.set(
+    await filesService.set(
       new File({
         id: fileId,
         groupId,
@@ -336,11 +331,11 @@ app.post('/upload-user-file', async (req, res) => {
   if (!groupId) {
     // sync state was reset, create new group
     groupId = uuidv4();
-    filesService.update(fileId, new FileUpdate({ groupId }));
+    await filesService.update(fileId, new FileUpdate({ groupId }));
   }
 
   // Regardless, update some properties
-  filesService.update(
+  await filesService.update(
     fileId,
     new FileUpdate({
       syncVersion: syncFormatVersion,
@@ -355,8 +350,6 @@ app.post('/upload-user-file', async (req, res) => {
 app.get('/download-user-file', async (req, res) => {
   const fileId = req.headers['x-actual-file-id'];
   if (typeof fileId !== 'string') {
-    // FIXME: Not sure how this cannot be a string when the header is
-    // set.
     res.status(400).send('Single file ID is required');
     return;
   }
@@ -366,7 +359,7 @@ app.get('/download-user-file', async (req, res) => {
   }
 
   const filesService = new FilesService(getAccountDb());
-  const file = verifyFileExists(
+  const file = await verifyFileExists(
     fileId,
     filesService,
     res,
@@ -377,7 +370,7 @@ app.get('/download-user-file', async (req, res) => {
     return;
   }
 
-  const fileAccessError = requireFileAccess(file, res.locals.user_id);
+  const fileAccessError = await requireFileAccess(file, res.locals.user_id);
   if (fileAccessError) {
     res.status(403);
     res.send(fileAccessError);
@@ -387,7 +380,6 @@ app.get('/download-user-file', async (req, res) => {
   const path = getPathForUserFile(fileId);
 
   if (!path.startsWith(resolve(config.get('userFiles')))) {
-    //Ensure the user doesn't try to access files outside of the user files directory
     res.status(403).send('Access denied');
     return;
   }
@@ -396,62 +388,56 @@ app.get('/download-user-file', async (req, res) => {
   res.sendFile(path, { dotfiles: 'allow' });
 });
 
-app.post('/update-user-filename', (req, res) => {
+app.post('/update-user-filename', async (req, res) => {
   const { fileId, name } = req.body || {};
 
   const filesService = new FilesService(getAccountDb());
-  const file = verifyFileExists(fileId, filesService, res, 'file-not-found');
+  const file = await verifyFileExists(fileId, filesService, res, 'file-not-found');
 
   if (!file) {
     return;
   }
 
-  const fileAccessError = requireFileAccess(file, res.locals.user_id);
+  const fileAccessError = await requireFileAccess(file, res.locals.user_id);
   if (fileAccessError) {
     res.status(403);
     res.send(fileAccessError);
     return;
   }
 
-  filesService.update(fileId, new FileUpdate({ name }));
+  await filesService.update(fileId, new FileUpdate({ name }));
   res.send(OK_RESPONSE);
 });
 
-app.get('/list-user-files', (req, res) => {
+app.get('/list-user-files', async (req, res) => {
   const fileService = new FilesService(getAccountDb());
-  const rows = fileService.find({ userId: res.locals.user_id });
-  res.send({
-    status: 'ok',
-    data: rows.map(row => ({
+  const rows = await fileService.find({ userId: res.locals.user_id });
+  const result = await Promise.all(
+    rows.map(async row => ({
       deleted: boolToInt(row.deleted),
       fileId: row.id,
       groupId: row.groupId,
       name: row.name,
       encryptKeyId: row.encryptKeyId,
       owner: row.owner,
-      usersWithAccess: fileService.findUsersWithAccess(row.id).map(access => ({
+      usersWithAccess: (await fileService.findUsersWithAccess(row.id)).map(access => ({
         ...access,
         owner: access.userId === row.owner,
       })),
     })),
+  );
+  res.send({
+    status: 'ok',
+    data: result,
   });
 });
 
-app.get('/get-user-file-info', (req, res) => {
+app.get('/get-user-file-info', async (req, res) => {
   const fileId = req.headers['x-actual-file-id'];
-
-  // TODO: Return 422 if fileId is not provided. Need to make sure frontend can handle it
-  // if (!fileId) {
-  //   return res.status(422).send({
-  //     details: 'fileId-required',
-  //     reason: 'unprocessable-entity',
-  //     status: 'error',
-  //   });
-  // }
 
   const fileService = new FilesService(getAccountDb());
 
-  const file = verifyFileExists(fileId, fileService, res, {
+  const file = await verifyFileExists(fileId, fileService, res, {
     status: 'error',
     reason: 'file-not-found',
   });
@@ -460,7 +446,7 @@ app.get('/get-user-file-info', (req, res) => {
     return;
   }
 
-  const fileAccessError = requireFileAccess(file, res.locals.user_id);
+  const fileAccessError = await requireFileAccess(file, res.locals.user_id);
   if (fileAccessError) {
     res.status(403);
     res.send(fileAccessError);
@@ -470,12 +456,12 @@ app.get('/get-user-file-info', (req, res) => {
   res.send({
     status: 'ok',
     data: {
-      deleted: boolToInt(file.deleted), //   FIXME: convert to boolean, make sure it works in the frontend
+      deleted: boolToInt(file.deleted),
       fileId: file.id,
       groupId: file.groupId,
       name: file.name,
       encryptMeta: file.encryptMeta ? JSON.parse(file.encryptMeta) : null,
-      usersWithAccess: fileService.findUsersWithAccess(file.id).map(access => ({
+      usersWithAccess: (await fileService.findUsersWithAccess(file.id)).map(access => ({
         ...access,
         owner: access.userId === file.owner,
       })),
@@ -483,7 +469,7 @@ app.get('/get-user-file-info', (req, res) => {
   });
 });
 
-app.post('/delete-user-file', (req, res) => {
+app.post('/delete-user-file', async (req, res) => {
   const { fileId } = req.body || {};
 
   if (!fileId) {
@@ -496,19 +482,19 @@ app.post('/delete-user-file', (req, res) => {
   }
 
   const filesService = new FilesService(getAccountDb());
-  const file = verifyFileExists(fileId, filesService, res, 'file-not-found');
+  const file = await verifyFileExists(fileId, filesService, res, 'file-not-found');
   if (!file) {
     return;
   }
 
-  const fileAccessError = requireFileAccess(file, res.locals.user_id);
+  const fileAccessError = await requireFileAccess(file, res.locals.user_id);
   if (fileAccessError) {
     res.status(403);
     res.send(fileAccessError);
     return;
   }
 
-  filesService.update(fileId, new FileUpdate({ deleted: true }));
+  await filesService.update(fileId, new FileUpdate({ deleted: true }));
 
   res.send(OK_RESPONSE);
 });
