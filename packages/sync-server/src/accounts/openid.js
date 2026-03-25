@@ -49,10 +49,10 @@ export async function bootstrapOpenId(configParameter) {
 
   const accountDb = getAccountDb();
   try {
-    accountDb.transaction(() => {
-      accountDb.mutate('DELETE FROM auth WHERE method = ?', ['openid']);
-      accountDb.mutate('UPDATE auth SET active = 0');
-      accountDb.mutate(
+    await accountDb.transaction(async txDb => {
+      await txDb.mutate('DELETE FROM auth WHERE method = ?', ['openid']);
+      await txDb.mutate('UPDATE auth SET active = 0');
+      await txDb.mutate(
         "INSERT INTO auth (method, display_name, extra_data, active) VALUES ('openid', 'OpenID', ?, 1)",
         [JSON.stringify(configParameter)],
       );
@@ -96,20 +96,21 @@ export async function loginWithOpenIdSetup(
   if (!returnUrl) {
     return { error: 'return-url-missing' };
   }
-  if (!isValidRedirectUrl(returnUrl)) {
+  if (!(await isValidRedirectUrl(returnUrl))) {
     return { error: 'invalid-return-url' };
   }
 
   const accountDb = getAccountDb();
 
-  const { countUsersWithUserName } = accountDb.first(
-    'SELECT count(*) as countUsersWithUserName FROM users WHERE user_name <> ?',
+  const row = await accountDb.first(
+    'SELECT count(*) as "countUsersWithUserName" FROM users WHERE user_name <> ?',
     [''],
   );
+  const countUsersWithUserName = row ? row.countUsersWithUserName : 0;
   if (countUsersWithUserName === 0) {
-    const methods = listLoginMethods();
+    const methods = await listLoginMethods();
     if (methods.some(authMethod => authMethod.method === 'password')) {
-      const valid = checkPassword(firstTimeLoginPassword);
+      const valid = await checkPassword(firstTimeLoginPassword);
 
       if (!valid) {
         return { error: 'invalid-password' };
@@ -117,15 +118,15 @@ export async function loginWithOpenIdSetup(
     }
   }
 
-  let config = accountDb.first('SELECT extra_data FROM auth WHERE method = ?', [
+  let openidConfig = await accountDb.first('SELECT extra_data FROM auth WHERE method = ?', [
     'openid',
   ]);
-  if (!config) {
+  if (!openidConfig) {
     return { error: 'openid-not-configured' };
   }
 
   try {
-    config = JSON.parse(config['extra_data']);
+    openidConfig = JSON.parse(openidConfig['extra_data']);
   } catch (err) {
     console.error('Error parsing OpenID configuration:', err);
     return { error: 'openid-setup-failed' };
@@ -133,7 +134,7 @@ export async function loginWithOpenIdSetup(
 
   let client;
   try {
-    client = await setupOpenIdClient(config);
+    client = await setupOpenIdClient(openidConfig);
   } catch (err) {
     console.error('Error setting up OpenID client:', err);
     return { error: 'openid-setup-failed' };
@@ -146,11 +147,11 @@ export async function loginWithOpenIdSetup(
   const now_time = Date.now();
   const expiry_time = now_time + 300 * 1000;
 
-  accountDb.mutate(
+  await accountDb.mutate(
     'DELETE FROM pending_openid_requests WHERE expiry_time < ?',
     [now_time],
   );
-  accountDb.mutate(
+  await accountDb.mutate(
     'INSERT INTO pending_openid_requests (state, code_verifier, return_url, expiry_time) VALUES (?, ?, ?, ?)',
     [state, code_verifier, returnUrl, expiry_time],
   );
@@ -175,7 +176,7 @@ export async function loginWithOpenIdFinalize(body) {
   }
 
   const accountDb = getAccountDb();
-  let configFromDb = accountDb.first(
+  let configFromDb = await accountDb.first(
     "SELECT extra_data FROM auth WHERE method = 'openid' AND active = 1",
   );
   if (!configFromDb) {
@@ -195,7 +196,7 @@ export async function loginWithOpenIdFinalize(body) {
     return { error: 'openid-setup-failed' };
   }
 
-  const pendingRequest = accountDb.first(
+  const pendingRequest = await accountDb.first(
     'SELECT code_verifier, return_url FROM pending_openid_requests WHERE state = ? AND expiry_time > ?',
     [body.state, Date.now()],
   );
@@ -237,14 +238,15 @@ export async function loginWithOpenIdFinalize(body) {
 
     let userId = null;
     try {
-      accountDb.transaction(() => {
-        const { countUsersWithUserName } = accountDb.first(
-          'SELECT count(*) as countUsersWithUserName FROM users WHERE user_name <> ?',
+      await accountDb.transaction(async txDb => {
+        const countRow = await txDb.first(
+          'SELECT count(*) as "countUsersWithUserName" FROM users WHERE user_name <> ?',
           [''],
         );
+        const countUsersWithUserName = countRow ? countRow.countUsersWithUserName : 0;
 
         // Check if user was created by another transaction
-        const existingUser = accountDb.first(
+        const existingUser = await txDb.first(
           'SELECT id FROM users WHERE user_name = ?',
           [identity],
         );
@@ -255,7 +257,7 @@ export async function loginWithOpenIdFinalize(body) {
             config.get('userCreationMode') === 'login')
         ) {
           userId = uuidv4();
-          accountDb.mutate(
+          await txDb.mutate(
             'INSERT INTO users (id, user_name, display_name, enabled, owner, role) VALUES (?, ?, ?, 1, ?, ?)',
             [
               userId,
@@ -267,30 +269,29 @@ export async function loginWithOpenIdFinalize(body) {
           );
 
           if (countUsersWithUserName === 0) {
-            const userFromPasswordMethod = getUserByUsername('');
+            const userFromPasswordMethod = await getUserByUsername('');
             if (userFromPasswordMethod) {
-              transferAllFilesFromUser(userId, userFromPasswordMethod.user_id);
+              await transferAllFilesFromUser(userId, userFromPasswordMethod);
             }
           }
         } else {
-          const { id: userIdFromDb, display_name: displayName } =
-            accountDb.first(
-              'SELECT id, display_name FROM users WHERE user_name = ? and enabled = 1',
-              [identity],
-            ) || {};
+          const userRow = await txDb.first(
+            'SELECT id, display_name FROM users WHERE user_name = ? and enabled = 1',
+            [identity],
+          );
 
-          if (userIdFromDb == null) {
+          if (!userRow || userRow.id == null) {
             throw new Error('openid-grant-failed');
           }
 
-          if (!displayName && userInfo.name) {
-            accountDb.mutate('UPDATE users set display_name = ? WHERE id = ?', [
+          if (!userRow.display_name && userInfo.name) {
+            await txDb.mutate('UPDATE users set display_name = ? WHERE id = ?', [
               userInfo.name,
-              userIdFromDb,
+              userRow.id,
             ]);
           }
 
-          userId = userIdFromDb;
+          userId = userRow.id;
         }
       });
     } catch (error) {
@@ -317,12 +318,12 @@ export async function loginWithOpenIdFinalize(body) {
       expiration = Math.floor(Date.now() / 1000) + 10 * 60; // Default to 10 minutes
     }
 
-    accountDb.mutate(
+    await accountDb.mutate(
       'INSERT INTO sessions (token, expires_at, user_id, auth_method) VALUES (?, ?, ?, ?)',
       [token, expiration, userId, 'openid'],
     );
 
-    clearExpiredSessions();
+    await clearExpiredSessions();
 
     return { url: `${return_url}/openid-cb?token=${token}` };
   } catch (err) {
@@ -331,8 +332,8 @@ export async function loginWithOpenIdFinalize(body) {
   }
 }
 
-export function getServerHostname() {
-  const auth = getAccountDb().first(
+export async function getServerHostname() {
+  const auth = await getAccountDb().first(
     'select * from auth WHERE method = ? and active = 1',
     ['openid'],
   );
@@ -347,8 +348,8 @@ export function getServerHostname() {
   return null;
 }
 
-export function isValidRedirectUrl(url) {
-  const serverHostname = getServerHostname();
+export async function isValidRedirectUrl(url) {
+  const serverHostname = await getServerHostname();
 
   if (!serverHostname) {
     return false;

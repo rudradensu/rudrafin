@@ -5,7 +5,7 @@ import {
 } from '../account-db';
 import { config } from '../load-config';
 
-if (needsBootstrap()) {
+if (await needsBootstrap()) {
   console.log(
     "It looks like you don't have a password set yet. Password is the fallback authentication method when using OpenID. Execute the command reset-password before using this command!",
   );
@@ -14,7 +14,7 @@ if (needsBootstrap()) {
 } else {
   console.log('Enabling openid based on Environment variables or config.json');
   try {
-    const loginMethod = getActiveLoginMethod();
+    const loginMethod = await getActiveLoginMethod();
     console.log(`Current login method: ${loginMethod}`);
 
     if (loginMethod === 'openid') {

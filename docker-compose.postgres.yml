@@ -1,0 +1,86 @@
+###################################################
+# PostgreSQL deployment for Actual Budget.
+#
+# Three containers:
+#
+# Container 1 (actual-postgres):
+#   PostgreSQL 16 database server. Owns all
+#   persistent data via a named volume.
+#
+# Container 2 (actual-api):
+#   The Actual Budget sync-server / REST API.
+#   Connects to actual-postgres via ACTUAL_POSTGRES_URL.
+#
+# Container 3 (actual-web):
+#   The Actual Budget web frontend served by
+#   the sync-server when NODE_ENV=production.
+#   (Included in the actual-api image; no separate
+#   container is required unless you split the build.)
+#
+# Usage:
+#   docker compose -f docker-compose.postgres.yml up -d
+#   docker compose -f docker-compose.postgres.yml down
+###################################################
+
+services:
+  actual-postgres:
+    image: postgres:16-alpine
+    container_name: actual-postgres
+    environment:
+      POSTGRES_DB: actual
+      POSTGRES_USER: actual
+      POSTGRES_PASSWORD: actual
+    volumes:
+      - actual-postgres-data:/var/lib/postgresql/data
+    ports:
+      # Expose only on localhost so the DB is not reachable from outside the host.
+      # Remove this ports mapping (or restrict to 127.0.0.1) in production.
+      - '127.0.0.1:5432:5432'
+    restart: unless-stopped
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U actual -d actual']
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+
+  actual-api:
+    image: actualbudget/actual-server:latest
+    container_name: actual-api
+    depends_on:
+      actual-postgres:
+        condition: service_healthy
+    environment:
+      - NODE_ENV=production
+      # PostgreSQL connection URL — references the service name 'actual-postgres'.
+      - ACTUAL_POSTGRES_URL=postgresql://actual:actual@actual-postgres:5432/actual
+      # Uncomment to customise other settings:
+      # - ACTUAL_PORT=5006
+      # - ACTUAL_HTTPS_KEY=/data/selfhost.key
+      # - ACTUAL_HTTPS_CERT=/data/selfhost.crt
+      # - ACTUAL_UPLOAD_FILE_SYNC_SIZE_LIMIT_MB=20
+      # - ACTUAL_UPLOAD_SYNC_ENCRYPTED_FILE_SYNC_SIZE_LIMIT_MB=50
+      # - ACTUAL_UPLOAD_FILE_SIZE_LIMIT_MB=20
+      # See all options at https://actualbudget.org/docs/config/
+    volumes:
+      # User-uploaded budget files are still stored on disk.
+      - actual-user-files:/data/user-files
+      - actual-server-files:/data/server-files
+    ports:
+      # Access Actual Budget at http://localhost:5006
+      - '5006:5006'
+    restart: unless-stopped
+    healthcheck:
+      test: ['CMD-SHELL', 'node build/src/scripts/health-check.js']
+      interval: 60s
+      timeout: 10s
+      retries: 3
+      start_period: 20s
+
+volumes:
+  actual-postgres-data:
+    driver: local
+  actual-user-files:
+    driver: local
+  actual-server-files:
+    driver: local

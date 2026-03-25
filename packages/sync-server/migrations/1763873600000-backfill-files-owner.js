@@ -2,15 +2,12 @@ import { getAccountDb } from '../src/account-db';
 
 export const up = async function () {
   const accountDb = getAccountDb();
-
-  const admin = accountDb.first(
+  const admin = await accountDb.first(
     'SELECT id FROM users WHERE role = ? ORDER BY id LIMIT 1',
     ['ADMIN'],
   );
   if (admin) {
-    accountDb.mutate('UPDATE files SET owner = ? WHERE owner IS NULL', [
-      admin.id,
-    ]);
+    await accountDb.mutate('UPDATE files SET owner = ? WHERE owner IS NULL', [admin.id]);
   }
 };
 

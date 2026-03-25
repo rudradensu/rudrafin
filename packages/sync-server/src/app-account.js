@@ -23,24 +23,18 @@ app.use(errorMiddleware);
 app.use(requestLoggerMiddleware);
 export { app as handlers };
 
-// Non-authenticated endpoints:
-//
-// /needs-bootstrap
-// /boostrap (special endpoint for setting up the instance, cant call again)
-// /login
-
-app.get('/needs-bootstrap', (req, res) => {
-  const availableLoginMethods = listLoginMethods();
+app.get('/needs-bootstrap', async (req, res) => {
+  const availableLoginMethods = await listLoginMethods();
   res.send({
     status: 'ok',
     data: {
-      bootstrapped: !needsBootstrap(),
+      bootstrapped: !(await needsBootstrap()),
       loginMethod:
         availableLoginMethods.length === 1
           ? availableLoginMethods[0].method
-          : getLoginMethod(),
+          : await getLoginMethod(),
       availableLoginMethods,
-      multiuser: getActiveLoginMethod() === 'openid',
+      multiuser: (await getActiveLoginMethod()) === 'openid',
     },
   });
 });
@@ -55,13 +49,13 @@ app.post('/bootstrap', async (req, res) => {
   res.send({ status: 'ok', data: boot });
 });
 
-app.get('/login-methods', (req, res) => {
-  const methods = listLoginMethods();
+app.get('/login-methods', async (req, res) => {
+  const methods = await listLoginMethods();
   res.send({ status: 'ok', methods });
 });
 
 app.post('/login', async (req, res) => {
-  const loginMethod = getLoginMethod(req);
+  const loginMethod = await getLoginMethod(req);
   console.log('Logging in via ' + loginMethod);
   let tokenRes = null;
   switch (loginMethod) {
@@ -75,7 +69,7 @@ app.post('/login', async (req, res) => {
         return;
       } else {
         if (validateAuthHeader(req)) {
-          tokenRes = loginWithPassword(headerVal);
+          tokenRes = await loginWithPassword(headerVal);
         } else {
           res.send({ status: 'error', reason: 'proxy-not-trusted' });
           return;
@@ -84,7 +78,7 @@ app.post('/login', async (req, res) => {
       break;
     }
     case 'openid': {
-      if (!isValidRedirectUrl(req.body.returnUrl)) {
+      if (!(await isValidRedirectUrl(req.body.returnUrl))) {
         res
           .status(400)
           .send({ status: 'error', reason: 'Invalid redirect URL' });
@@ -104,7 +98,7 @@ app.post('/login', async (req, res) => {
     }
 
     default:
-      tokenRes = loginWithPassword(req.body.password);
+      tokenRes = await loginWithPassword(req.body.password);
       break;
   }
   const { error, token } = tokenRes;
@@ -117,15 +111,15 @@ app.post('/login', async (req, res) => {
   res.send({ status: 'ok', data: { token } });
 });
 
-app.post('/change-password', (req, res) => {
-  const session = validateSession(req, res);
+app.post('/change-password', async (req, res) => {
+  const session = await validateSession(req, res);
   if (!session) return;
 
-  if (!isAdmin(session.user_id)) {
+  if (!(await isAdmin(session.user_id))) {
     res.status(403).send({
       status: 'error',
       reason: 'forbidden',
-      details: 'permission-not-found',
+      details: 'password-auth-not-active',
     });
     return;
   }
@@ -139,7 +133,7 @@ app.post('/change-password', (req, res) => {
     return;
   }
 
-  const { error } = changePassword(req.body.password);
+  const { error } = await changePassword(req.body.password);
 
   if (error) {
     res.status(400).send({ status: 'error', reason: error });
@@ -149,11 +143,11 @@ app.post('/change-password', (req, res) => {
   res.send({ status: 'ok', data: {} });
 });
 
-app.post('/server-prefs', (req, res) => {
-  const session = validateSession(req, res);
+app.post('/server-prefs', async (req, res) => {
+  const session = await validateSession(req, res);
   if (!session) return;
 
-  if (!isAdmin(session.user_id)) {
+  if (!(await isAdmin(session.user_id))) {
     res.status(403).send({
       status: 'error',
       reason: 'forbidden',
@@ -169,15 +163,15 @@ app.post('/server-prefs', (req, res) => {
     return;
   }
 
-  setServerPrefs(prefs);
+  await setServerPrefs(prefs);
 
   res.send({ status: 'ok', data: {} });
 });
 
-app.get('/validate', (req, res) => {
-  const session = validateSession(req, res);
+app.get('/validate', async (req, res) => {
+  const session = await validateSession(req, res);
   if (session) {
-    const user = getUserInfo(session.user_id);
+    const user = await getUserInfo(session.user_id);
     if (!user) {
       res.status(400).send({ status: 'error', reason: 'User not found' });
       return;
@@ -192,7 +186,7 @@ app.get('/validate', (req, res) => {
         userId: session?.user_id,
         displayName: user?.display_name,
         loginMethod: session?.auth_method,
-        prefs: getServerPrefs(),
+        prefs: await getServerPrefs(),
       },
     });
   }

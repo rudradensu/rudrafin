@@ -1,58 +1,80 @@
-import Database from 'better-sqlite3';
+import pg from 'pg';
+
+function convertPlaceholders(sql) {
+  let i = 0;
+  return sql.replace(/\?/g, () => `$${++i}`);
+}
 
 class WrappedDatabase {
-  constructor(db) {
-    this.db = db;
+  constructor(pool) {
+    this.pool = pool;
   }
 
-  /**
-   * @param {string} sql
-   * @param {string[]} params
-   */
-  all(sql, params = []) {
-    const stmt = this.db.prepare(sql);
-    return stmt.all(...params);
+  async all(sql, params = []) {
+    const { rows } = await this.pool.query(convertPlaceholders(sql), params);
+    return rows;
   }
 
-  /**
-   * @param {string} sql
-   * @param {string[]} params
-   */
-  first(sql, params = []) {
-    const rows = this.all(sql, params);
+  async first(sql, params = []) {
+    const rows = await this.all(sql, params);
     return rows.length === 0 ? null : rows[0];
   }
 
-  /**
-   * @param {string} sql
-   */
-  exec(sql) {
-    return this.db.exec(sql);
+  async exec(sql) {
+    const statements = sql
+      .split(';')
+      .map(s => s.trim())
+      .filter(s => s.length > 0);
+    for (const stmt of statements) {
+      await this.pool.query(stmt);
+    }
   }
 
-  /**
-   * @param {string} sql
-   * @param {string[]} params
-   */
-  mutate(sql, params = []) {
-    const stmt = this.db.prepare(sql);
-    const info = stmt.run(...params);
-    return { changes: info.changes, insertId: info.lastInsertRowid };
+  async mutate(sql, params = []) {
+    const { rowCount, rows } = await this.pool.query(
+      convertPlaceholders(sql),
+      params,
+    );
+    const insertId = rows && rows.length > 0 ? rows[0] : null;
+    return { changes: rowCount ?? 0, insertId };
   }
 
-  /**
-   * @param {() => void} fn
-   */
-  transaction(fn) {
-    return this.db.transaction(fn)();
+  async transaction(fn) {
+    const client = await this.pool.connect();
+    try {
+      await client.query('BEGIN');
+      const wrappedClient = new WrappedDatabase(client);
+      const result = await fn(wrappedClient);
+      await client.query('COMMIT');
+      return result;
+    } catch (err) {
+      await client.query('ROLLBACK');
+      throw err;
+    } finally {
+      client.release();
+    }
   }
 
-  close() {
-    this.db.close();
+  async close() {
+    if (this.pool.end) {
+      await this.pool.end();
+    }
   }
 }
 
-/** @param {string} filename */
-export function openDatabase(filename) {
-  return new WrappedDatabase(new Database(filename));
+let _sharedPool = null;
+
+function getSharedPool() {
+  if (!_sharedPool) {
+    _sharedPool = new pg.Pool({
+      connectionString:
+        process.env.ACTUAL_POSTGRES_URL ||
+        'postgresql://postgres:postgres@localhost:5432/actual',
+    });
+  }
+  return _sharedPool;
+}
+
+export function openDatabase() {
+  return new WrappedDatabase(getSharedPool());
 }

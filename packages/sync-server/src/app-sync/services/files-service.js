@@ -93,8 +93,8 @@ class FilesService {
     this.accountDb = accountDb;
   }
 
-  get(fileId) {
-    const rawFile = this.getRaw(fileId);
+  async get(fileId) {
+    const rawFile = await this.getRaw(fileId);
     if (!rawFile || (rawFile && rawFile.deleted)) {
       throw new FileNotFound();
     }
@@ -102,9 +102,9 @@ class FilesService {
     return this.validate(rawFile);
   }
 
-  set(file) {
+  async set(file) {
     const deletedInt = boolToInt(file.deleted);
-    this.accountDb.mutate(
+    await this.accountDb.mutate(
       'INSERT INTO files (id, group_id, sync_version, name, encrypt_meta, encrypt_salt, encrypt_test, encrypt_keyid, deleted, owner) VALUES (?, ?, ?, ?, ?, ?, ?, ? ,?, ?)',
       [
         file.id,
@@ -121,10 +121,10 @@ class FilesService {
     );
   }
 
-  find({ userId, limit = 1000 }) {
-    const canSeeAll = isAdmin(userId);
+  async find({ userId, limit = 1000 }) {
+    const canSeeAll = await isAdmin(userId);
 
-    return (
+    const rows = await (
       canSeeAll
         ? this.accountDb.all('SELECT * FROM files WHERE deleted = 0 LIMIT ?', [
             limit,
@@ -142,13 +142,14 @@ class FilesService {
        WHERE files.deleted = 0 LIMIT ?`,
             [userId, userId, limit],
           )
-    ).map(item => this.validate(item));
+    );
+    return rows.map(item => this.validate(item));
   }
 
-  findUsersWithAccess(fileId) {
+  async findUsersWithAccess(fileId) {
     const userAccess =
-      this.accountDb.all(
-        `SELECT UA.user_id as userId, users.display_name displayName, users.user_name userName
+      (await this.accountDb.all(
+        `SELECT UA.user_id as "userId", users.display_name as "displayName", users.user_name as "userName"
               FROM files
                 JOIN user_access UA ON UA.file_id = files.id
                 JOIN users on users.id = UA.user_id
@@ -160,12 +161,12 @@ class FilesService {
               WHERE files.id = ?
           `,
         [fileId, fileId],
-      ) || [];
+      )) || [];
 
     return userAccess;
   }
 
-  update(id, fileUpdate) {
+  async update(id, fileUpdate) {
     let query = 'UPDATE files SET';
     const params = [];
     const updates = [];
@@ -207,7 +208,7 @@ class FilesService {
       query += ' ' + updates.join(', ') + ' WHERE id = ?';
       params.push(id);
 
-      const res = this.accountDb.mutate(query, params);
+      const res = await this.accountDb.mutate(query, params);
 
       if (res.changes !== 1) {
         throw new GenericFileError('Could not update File', { id });
@@ -215,10 +216,10 @@ class FilesService {
     }
 
     // Return the modified object
-    return this.validate(this.getRaw(id));
+    return this.validate(await this.getRaw(id));
   }
 
-  getRaw(fileId) {
+  async getRaw(fileId) {
     return this.accountDb.first(`SELECT * FROM files WHERE id = ?`, [fileId]);
   }
 
@@ -238,6 +239,4 @@ class FilesService {
   }
 }
 
-const filesService = new FilesService(getAccountDb());
-
-export { filesService, FilesService, File, FileUpdate };
+export { FilesService, File, FileUpdate };
