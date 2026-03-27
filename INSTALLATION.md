@@ -6,17 +6,17 @@ This guide covers every supported way to package and run Actual Budget.
 
 ## Prerequisites
 
-| Requirement | Version |
-|---|---|
-| Docker (for container deployments) | 24 or later (with Compose V2) |
-| Node.js (for local / CLI deployments) | 22 or later |
-| Yarn | 4.9.1 or later |
+| Requirement                           | Version                       |
+| ------------------------------------- | ----------------------------- |
+| Docker (for container deployments)    | 24 or later (with Compose V2) |
+| Node.js (for local / CLI deployments) | 22 or later                   |
+| Yarn                                  | 4.9.1 or later                |
 
 ---
 
 ## Option 1 — Single-container Docker deployment (recommended for most users)
 
-This is the simplest way to run Actual Budget.  A single image bundles the
+This is the simplest way to run Actual Budget. A single image bundles the
 sync-server and the web front-end.
 
 ```bash
@@ -48,7 +48,7 @@ docker run --pull=always --restart=unless-stopped -d \
 ## Option 2 — Two-container Docker Compose deployment
 
 This setup separates concerns: one container owns the SQLite database files and
-one container runs the application.  This makes it easier to:
+one container runs the application. This makes it easier to:
 
 - Back up the database by exec-ing into the `actual-db` container.
 - Replace or upgrade the application container independently.
@@ -70,7 +70,7 @@ The server will be available at **http://localhost:5006**.
 ### Step 3 — Configuration (optional)
 
 Uncomment and adjust the `environment:` variables in `docker-compose.split.yml`
-to change the port, enable HTTPS, or adjust upload limits.  A full list of
+to change the port, enable HTTPS, or adjust upload limits. A full list of
 options is at https://actualbudget.org/docs/config/.
 
 ### Step 4 — Update
@@ -96,7 +96,7 @@ docker run --rm \
 ## Option 3 — Docker Compose (single container, from sync-server package)
 
 The `packages/sync-server/docker-compose.yml` file uses the published image
-with a host-directory volume.  This is the minimal production compose file
+with a host-directory volume. This is the minimal production compose file
 and suits users who prefer simplicity over separation of concerns.
 
 ```bash
@@ -134,10 +134,10 @@ actual-server --reset-password         # reset the admin password
 
 ## Option 6 — Managed hosting
 
-| Provider | Notes |
-|---|---|
+| Provider                                             | Notes                   |
+| ---------------------------------------------------- | ----------------------- |
 | [PikaPods](https://www.pikapods.com/pods?run=actual) | One-click, ~$1.40/month |
-| [Fly.io](https://actualbudget.org/docs/install/fly) | ~$1.50/month |
+| [Fly.io](https://actualbudget.org/docs/install/fly)  | ~$1.50/month            |
 
 ---
 
@@ -150,8 +150,8 @@ https://actualbudget.org/docs/config/.
 
 ## Verifying the installation
 
-Open **http://\<host\>:5006** in a browser.  You should see the Actual Budget
-setup screen.  If the server is behind a proxy, make sure the proxy forwards
+Open **http://\<host\>:5006** in a browser. You should see the Actual Budget
+setup screen. If the server is behind a proxy, make sure the proxy forwards
 the `Host` header and does not strip `Connection: upgrade`.
 
 ---

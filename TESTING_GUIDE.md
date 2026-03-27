@@ -22,13 +22,13 @@ repository and how to write new tests when fixing bugs or adding features.
 
 ## Testing overview
 
-| Layer | Framework | Location | Run command |
-|---|---|---|---|
-| Unit | Vitest | Alongside source files (`*.test.ts`) | `yarn test` |
-| E2E (browser) | Playwright | `packages/desktop-client/e2e/` | `yarn e2e` |
-| E2E (Electron) | Playwright | `packages/desktop-electron/e2e/` | `yarn e2e:desktop` |
-| Visual regression | Playwright | `*-snapshots/` dirs | `yarn vrt` |
-| Sync-server integration | Vitest + supertest | `packages/sync-server/src/*.test.*` | see below |
+| Layer                   | Framework          | Location                             | Run command        |
+| ----------------------- | ------------------ | ------------------------------------ | ------------------ |
+| Unit                    | Vitest             | Alongside source files (`*.test.ts`) | `yarn test`        |
+| E2E (browser)           | Playwright         | `packages/desktop-client/e2e/`       | `yarn e2e`         |
+| E2E (Electron)          | Playwright         | `packages/desktop-electron/e2e/`     | `yarn e2e:desktop` |
+| Visual regression       | Playwright         | `*-snapshots/` dirs                  | `yarn vrt`         |
+| Sync-server integration | Vitest + supertest | `packages/sync-server/src/*.test.*`  | see below          |
 
 The project uses **Lage** as a task runner to execute tests in parallel across
 all workspaces with smart caching.
@@ -77,7 +77,7 @@ yarn workspace @actual-app/core run test -- src/shared/util.test.ts
 
 ## End-to-end tests (Playwright)
 
-E2E tests launch a real browser and exercise the full UI.  A built version of
+E2E tests launch a real browser and exercise the full UI. A built version of
 the web front-end is served automatically during the test run.
 
 ### Prerequisites
@@ -153,7 +153,7 @@ yarn workspace @actual-app/sync-server run test
 ```
 
 Database migrations are applied automatically to a temporary test database
-before each test run.  See `packages/sync-server/vitest.config.ts` and
+before each test run. See `packages/sync-server/vitest.config.ts` and
 `packages/sync-server/vitest.globalSetup.js` for details.
 
 ---
@@ -161,14 +161,14 @@ before each test run.  See `packages/sync-server/vitest.config.ts` and
 ## CI pipeline
 
 The GitHub Actions workflow (`.github/workflows/check.yml`) runs on every pull
-request and merge to `master`.  It runs:
+request and merge to `master`. It runs:
 
 1. `yarn typecheck` — TypeScript type checking
 2. `yarn lint` — ESLint and oxfmt formatting check
 3. `yarn test` — all unit tests via Lage
 4. Playwright E2E tests (separate job)
 
-All checks must pass before a PR can be merged.  You can reproduce any CI step
+All checks must pass before a PR can be merged. You can reproduce any CI step
 locally with the commands listed in this guide.
 
 ---
@@ -199,7 +199,7 @@ describe('myFunction', () => {
 
 ### E2E test (Playwright)
 
-Add a new `.test.ts` file in `packages/desktop-client/e2e/`.  Reuse the page
+Add a new `.test.ts` file in `packages/desktop-client/e2e/`. Reuse the page
 models in `e2e/page-models/` for common interactions.
 
 ```typescript
@@ -272,14 +272,14 @@ yarn workspace @actual-app/web run playwright test \
 
 ## Test configuration reference
 
-| File | Purpose |
-|---|---|
-| `vitest.config.ts` (root) | Root Vitest config (Node environment) |
-| `packages/loot-core/vitest.config.ts` | loot-core unit test config |
-| `packages/sync-server/vitest.config.ts` | sync-server unit test config |
-| `packages/desktop-client/vitest.web.config.ts` | Browser-environment unit tests |
-| `packages/desktop-client/playwright.config.ts` | Playwright E2E and VRT config |
-| `lage.config.js` | Lage pipeline config (caching and parallelism) |
+| File                                           | Purpose                                        |
+| ---------------------------------------------- | ---------------------------------------------- |
+| `vitest.config.ts` (root)                      | Root Vitest config (Node environment)          |
+| `packages/loot-core/vitest.config.ts`          | loot-core unit test config                     |
+| `packages/sync-server/vitest.config.ts`        | sync-server unit test config                   |
+| `packages/desktop-client/vitest.web.config.ts` | Browser-environment unit tests                 |
+| `packages/desktop-client/playwright.config.ts` | Playwright E2E and VRT config                  |
+| `lage.config.js`                               | Lage pipeline config (caching and parallelism) |
 
 ---
 

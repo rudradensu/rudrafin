@@ -209,13 +209,13 @@ Server listens on ACTUAL_PORT (default: 5006)
 
 ## State ownership summary
 
-| Data | Where it lives | How it's accessed |
-|---|---|---|
+| Data                                      | Where it lives                | How it's accessed                    |
+| ----------------------------------------- | ----------------------------- | ------------------------------------ |
 | Budget transactions, categories, accounts | loot-core SQLite (per-device) | `send()` / `query()` worker messages |
-| Sync change records | sync-server SQLite | HTTP `/sync` |
-| User sessions and auth | sync-server SQLite | HTTP `/account` |
-| Global UI state (modals, theme, session) | Redux store | `useSelector()` / `useDispatch()` |
-| Server configuration | Environment variables | `load-config.js` |
+| Sync change records                       | sync-server SQLite            | HTTP `/sync`                         |
+| User sessions and auth                    | sync-server SQLite            | HTTP `/account`                      |
+| Global UI state (modals, theme, session)  | Redux store                   | `useSelector()` / `useDispatch()`    |
+| Server configuration                      | Environment variables         | `load-config.js`                     |
 
 ---
 

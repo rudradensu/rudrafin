@@ -22,15 +22,15 @@ in this repository.
 
 ## Prerequisites
 
-| Tool | Required version | Notes |
-|---|---|---|
-| Node.js | ≥ 22 | Use [nvm](https://github.com/nvm-sh/nvm) or [asdf](https://asdf-vm.com) to manage versions |
-| Yarn | ^4.9.1 | Managed via `packageManager` field — `corepack enable` then `yarn --version` |
-| Git | any recent | Required for cloning and commits |
-| Docker (optional) | 24+ | Only needed for container-based dev or running the split-container stack |
+| Tool              | Required version | Notes                                                                                      |
+| ----------------- | ---------------- | ------------------------------------------------------------------------------------------ |
+| Node.js           | ≥ 22             | Use [nvm](https://github.com/nvm-sh/nvm) or [asdf](https://asdf-vm.com) to manage versions |
+| Yarn              | ^4.9.1           | Managed via `packageManager` field — `corepack enable` then `yarn --version`               |
+| Git               | any recent       | Required for cloning and commits                                                           |
+| Docker (optional) | 24+              | Only needed for container-based dev or running the split-container stack                   |
 
 On Windows, during Node.js installation select **"Automatically install the
-necessary tools"** on the *Tools for Native Modules* page.  This is required
+necessary tools"** on the _Tools for Native Modules_ page. This is required
 to compile `better-sqlite3`.
 
 ---
@@ -75,13 +75,13 @@ rudrafin/          (cloned as "actual" from the upstream repo)
 
 ### Key packages in detail
 
-| Package | Workspace name | Description |
-|---|---|---|
-| `loot-core` | `@actual-app/core` | All budget calculations, shared types, and the client-side SQLite database |
-| `desktop-client` | `@actual-app/web` | React UI — components, hooks, pages, and Playwright E2E tests |
-| `sync-server` | `@actual-app/sync-server` | Express API, multi-device sync, auth, and integrations (GoCardless, Pluggy, SimpleFin) |
-| `component-library` | `@actual-app/components` | Reusable design-system components and 375+ SVG icons |
-| `api` | `@actual-app/api` | Scriptable Node.js API for importing/exporting budget data |
+| Package             | Workspace name            | Description                                                                            |
+| ------------------- | ------------------------- | -------------------------------------------------------------------------------------- |
+| `loot-core`         | `@actual-app/core`        | All budget calculations, shared types, and the client-side SQLite database             |
+| `desktop-client`    | `@actual-app/web`         | React UI — components, hooks, pages, and Playwright E2E tests                          |
+| `sync-server`       | `@actual-app/sync-server` | Express API, multi-device sync, auth, and integrations (GoCardless, Pluggy, SimpleFin) |
+| `component-library` | `@actual-app/components`  | Reusable design-system components and 375+ SVG icons                                   |
+| `api`               | `@actual-app/api`         | Scriptable Node.js API for importing/exporting budget data                             |
 
 ---
 
@@ -106,7 +106,7 @@ yarn start:desktop
 ```
 
 Open http://localhost:3001 in a browser or wait for the Electron window to
-appear.  On the setup screen choose **"View demo"** to load a realistic sample
+appear. On the setup screen choose **"View demo"** to load a realistic sample
 budget instantly.
 
 ---
@@ -132,8 +132,8 @@ yarn workspace docs start                       # live-preview the docs site
 
 ## Making a change — workflow
 
-1. **Read the code first.**  Find the relevant files before touching anything.
-2. **Make focused changes.**  One feature or bug fix per branch.
+1. **Read the code first.** Find the relevant files before touching anything.
+2. **Make focused changes.** One feature or bug fix per branch.
 3. **Type-check after every edit.**
    ```bash
    yarn typecheck
@@ -147,7 +147,7 @@ yarn workspace docs start                       # live-preview the docs site
    yarn test                           # all packages
    yarn workspace @actual-app/core run test   # only loot-core
    ```
-6. **Commit and push.**  See [Submitting a pull request](#submitting-a-pull-request).
+6. **Commit and push.** See [Submitting a pull request](#submitting-a-pull-request).
 
 ---
 
@@ -174,6 +174,7 @@ yarn workspace docs start                       # live-preview the docs site
 ### Imports
 
 ESLint enforces this order (separated by blank lines):
+
 1. React
 2. Node built-ins
 3. External packages
@@ -184,7 +185,7 @@ ESLint enforces this order (separated by blank lines):
 
 ### Internationalisation (i18n)
 
-All user-facing strings must be wrapped in `<Trans>` or `t()`.  Run
+All user-facing strings must be wrapped in `<Trans>` or `t()`. Run
 `yarn lint` to catch untranslated strings.
 
 ---
@@ -193,15 +194,15 @@ All user-facing strings must be wrapped in `<Trans>` or `t()`.  Run
 
 ### Where to look
 
-| Area | Starting point |
-|---|---|
-| Budget calculations | `packages/loot-core/src/shared/` |
-| Server API routes | `packages/sync-server/src/app-*.{js,ts}` |
-| React pages | `packages/desktop-client/src/components/` |
-| Custom hooks | `packages/desktop-client/src/hooks/` |
-| Shared UI components | `packages/component-library/src/` |
+| Area                         | Starting point                                                         |
+| ---------------------------- | ---------------------------------------------------------------------- |
+| Budget calculations          | `packages/loot-core/src/shared/`                                       |
+| Server API routes            | `packages/sync-server/src/app-*.{js,ts}`                               |
+| React pages                  | `packages/desktop-client/src/components/`                              |
+| Custom hooks                 | `packages/desktop-client/src/hooks/`                                   |
+| Shared UI components         | `packages/component-library/src/`                                      |
 | Database schema / migrations | `packages/sync-server/src/sql/` and `packages/sync-server/migrations/` |
-| Configuration options | `packages/sync-server/src/load-config.js` |
+| Configuration options        | `packages/sync-server/src/load-config.js`                              |
 
 ### Adding a new server route
 
@@ -226,19 +227,19 @@ All user-facing strings must be wrapped in `<Trans>` or `t()`.  Run
    ```bash
    yarn generate:release-notes
    ```
-4. Open a PR and fill in the template.  Link the issue with `Fixes #<number>`.
+4. Open a PR and fill in the template. Link the issue with `Fixes #<number>`.
 5. Keep the PR up to date with `master` by rebasing or merging.
 
 ---
 
 ## Useful references
 
-| Resource | URL |
-|---|---|
-| Community documentation | https://actualbudget.org/docs |
-| Project structure docs | https://actualbudget.org/docs/contributing/project-details |
-| Code style guide | `packages/docs/docs/contributing/code-style.md` |
-| Configuration options | https://actualbudget.org/docs/config/ |
-| Discord community | https://discord.gg/pRYNYr4W5A |
-| Installation guide | [INSTALLATION.md](./INSTALLATION.md) |
-| Testing guide | [TESTING_GUIDE.md](./TESTING_GUIDE.md) |
+| Resource                | URL                                                        |
+| ----------------------- | ---------------------------------------------------------- |
+| Community documentation | https://actualbudget.org/docs                              |
+| Project structure docs  | https://actualbudget.org/docs/contributing/project-details |
+| Code style guide        | `packages/docs/docs/contributing/code-style.md`            |
+| Configuration options   | https://actualbudget.org/docs/config/                      |
+| Discord community       | https://discord.gg/pRYNYr4W5A                              |
+| Installation guide      | [INSTALLATION.md](./INSTALLATION.md)                       |
+| Testing guide           | [TESTING_GUIDE.md](./TESTING_GUIDE.md)                     |

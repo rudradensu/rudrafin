@@ -13,7 +13,7 @@ yarn build:browser
 # Output: packages/desktop-client/build/
 ```
 
-This script (`./bin/package-browser`) runs Vite in production mode.  The
+This script (`./bin/package-browser`) runs Vite in production mode. The
 bundle includes:
 
 - The React UI
@@ -98,12 +98,12 @@ All workflow files live in `.github/workflows/`.
 
 **`.github/workflows/check.yml`**
 
-| Step | Command | What it checks |
-|---|---|---|
+| Step       | Command          | What it checks                    |
+| ---------- | ---------------- | --------------------------------- |
 | Type check | `yarn typecheck` | TypeScript strict-mode compliance |
-| Lint | `yarn lint` | oxlint rules + oxfmt formatting |
-| Unit tests | `yarn test` | All Vitest tests via Lage |
-| E2E tests | `yarn e2e` | Playwright browser tests |
+| Lint       | `yarn lint`      | oxlint rules + oxfmt formatting   |
+| Unit tests | `yarn test`      | All Vitest tests via Lage         |
+| E2E tests  | `yarn e2e`       | Playwright browser tests          |
 
 All four steps must pass before a PR can be merged.
 
@@ -114,24 +114,24 @@ All four steps must pass before a PR can be merged.
 
 ### Release workflows
 
-| Workflow | Trigger | What it does |
-|---|---|---|
-| `docker-release.yml` | Git release tag | Builds and pushes `actualbudget/actual-server:<version>` to Docker Hub |
-| `docker-edge.yml` | `master` push | Builds and pushes `actualbudget/actual-server:edge` |
-| `electron-master.yml` | `master` push | Builds Electron binaries for Windows/macOS/Linux |
-| `publish-npm-packages.yml` | Release tag | Publishes npm packages (`@actual-app/api`, etc.) |
-| `netlify-release.yml` | Release tag | Deploys the documentation site to Netlify |
+| Workflow                   | Trigger         | What it does                                                           |
+| -------------------------- | --------------- | ---------------------------------------------------------------------- |
+| `docker-release.yml`       | Git release tag | Builds and pushes `actualbudget/actual-server:<version>` to Docker Hub |
+| `docker-edge.yml`          | `master` push   | Builds and pushes `actualbudget/actual-server:edge`                    |
+| `electron-master.yml`      | `master` push   | Builds Electron binaries for Windows/macOS/Linux                       |
+| `publish-npm-packages.yml` | Release tag     | Publishes npm packages (`@actual-app/api`, etc.)                       |
+| `netlify-release.yml`      | Release tag     | Deploys the documentation site to Netlify                              |
 
 ### Other workflows
 
-| Workflow | Purpose |
-|---|---|
-| `e2e-test.yml` | Runs Playwright E2E tests on PR |
-| `vrt-update-generate.yml` | Generates new visual regression snapshots |
-| `codeql.yml` | CodeQL security scanning |
-| `autofix.yml` | Auto-applies lint fixes to PRs |
-| `release-notes.yml` | Collects and formats release notes |
-| `ai-generated-release-notes.yml` | AI-assisted release note generation |
+| Workflow                         | Purpose                                   |
+| -------------------------------- | ----------------------------------------- |
+| `e2e-test.yml`                   | Runs Playwright E2E tests on PR           |
+| `vrt-update-generate.yml`        | Generates new visual regression snapshots |
+| `codeql.yml`                     | CodeQL security scanning                  |
+| `autofix.yml`                    | Auto-applies lint fixes to PRs            |
+| `release-notes.yml`              | Collects and formats release notes        |
+| `ai-generated-release-notes.yml` | AI-assisted release note generation       |
 
 ---
 
@@ -139,16 +139,16 @@ All four steps must pass before a PR can be merged.
 
 All options are loaded via `packages/sync-server/src/load-config.js`.
 
-| Variable | Default | Description |
-|---|---|---|
-| `ACTUAL_PORT` | `5006` | Port to listen on |
-| `ACTUAL_DATA_DIR` | `/data` | Directory for all SQLite files |
-| `ACTUAL_HTTPS_KEY` | — | Path to TLS private key (enables HTTPS) |
-| `ACTUAL_HTTPS_CERT` | — | Path to TLS certificate |
-| `ACTUAL_UPLOAD_FILE_SIZE_LIMIT_MB` | `20` | Max budget file upload size |
-| `ACTUAL_UPLOAD_SYNC_ENCRYPTED_FILE_SYNC_SIZE_LIMIT_MB` | `50` | Max encrypted sync file size |
-| `ACTUAL_LOGIN_METHOD` | `password` | `password`, `header`, or `openid` |
-| `ACTUAL_TRUSTED_PROXIES` | — | Comma-separated list of trusted proxy IPs |
+| Variable                                               | Default    | Description                               |
+| ------------------------------------------------------ | ---------- | ----------------------------------------- |
+| `ACTUAL_PORT`                                          | `5006`     | Port to listen on                         |
+| `ACTUAL_DATA_DIR`                                      | `/data`    | Directory for all SQLite files            |
+| `ACTUAL_HTTPS_KEY`                                     | —          | Path to TLS private key (enables HTTPS)   |
+| `ACTUAL_HTTPS_CERT`                                    | —          | Path to TLS certificate                   |
+| `ACTUAL_UPLOAD_FILE_SIZE_LIMIT_MB`                     | `20`       | Max budget file upload size               |
+| `ACTUAL_UPLOAD_SYNC_ENCRYPTED_FILE_SYNC_SIZE_LIMIT_MB` | `50`       | Max encrypted sync file size              |
+| `ACTUAL_LOGIN_METHOD`                                  | `password` | `password`, `header`, or `openid`         |
+| `ACTUAL_TRUSTED_PROXIES`                               | —          | Comma-separated list of trusted proxy IPs |
 
 Full reference: <https://actualbudget.org/docs/config/>
 
@@ -165,7 +165,7 @@ yarn test:debug     # run all tests (skip cache)
 yarn build          # build all packages in dependency order
 ```
 
-Lage caches results in `.lage/`.  Clear the cache if tests behave unexpectedly:
+Lage caches results in `.lage/`. Clear the cache if tests behave unexpectedly:
 
 ```bash
 rm -rf .lage

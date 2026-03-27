@@ -6,12 +6,12 @@
 
 ## Prerequisites
 
-| Tool | Version | How to install |
-|---|---|---|
-| Node.js | ≥ 22 | [nodejs.org](https://nodejs.org/) or `nvm install 22` |
-| Yarn | ^4.9.1 | `corepack enable` then check with `yarn --version` |
-| Git | any recent | [git-scm.com](https://git-scm.com/) |
-| Docker (optional) | 24+ | [docs.docker.com/get-docker](https://docs.docker.com/get-docker/) |
+| Tool              | Version    | How to install                                                    |
+| ----------------- | ---------- | ----------------------------------------------------------------- |
+| Node.js           | ≥ 22       | [nodejs.org](https://nodejs.org/) or `nvm install 22`             |
+| Yarn              | ^4.9.1     | `corepack enable` then check with `yarn --version`                |
+| Git               | any recent | [git-scm.com](https://git-scm.com/)                               |
+| Docker (optional) | 24+        | [docs.docker.com/get-docker](https://docs.docker.com/get-docker/) |
 
 On Windows, during Node.js installation select **"Automatically install the
 necessary tools"** — this is required to compile the native `better-sqlite3`
@@ -28,7 +28,7 @@ yarn install          # install dependencies for every workspace
 yarn typecheck        # quick sanity-check — should pass on a clean clone
 ```
 
-> **Always run `yarn` commands from the repository root.**  Never `cd` into a
+> **Always run `yarn` commands from the repository root.** Never `cd` into a
 > child workspace.
 
 ---
@@ -57,7 +57,7 @@ yarn start:desktop
 ```
 
 **Tip:** On the setup screen choose **"View demo"** to load a pre-populated
-sample budget with realistic accounts, transactions, and categories.  This is
+sample budget with realistic accounts, transactions, and categories. This is
 much faster than starting from scratch and gives you a real dataset to work
 against.
 
@@ -94,20 +94,20 @@ git commit -m "fix: correct budget rollover calculation"
 
 ## Where to look
 
-| Area | Path |
-|---|---|
-| Budget calculation logic | `packages/loot-core/src/shared/` |
-| Server SQL operations | `packages/loot-core/src/server/db/` |
-| Transaction rules | `packages/loot-core/src/server/rules/` |
-| Recurring schedules | `packages/loot-core/src/server/schedules/` |
-| React pages / screens | `packages/desktop-client/src/components/` |
-| Custom React hooks | `packages/desktop-client/src/hooks/` |
-| Redux slices | `packages/desktop-client/src/redux/` |
-| Shared UI components | `packages/component-library/src/` |
-| Server HTTP routes | `packages/sync-server/src/app-*.{js,ts}` |
-| Server DB helpers | `packages/sync-server/src/account-db.js` |
-| Server DB migrations | `packages/sync-server/migrations/` |
-| Server configuration | `packages/sync-server/src/load-config.js` |
+| Area                     | Path                                       |
+| ------------------------ | ------------------------------------------ |
+| Budget calculation logic | `packages/loot-core/src/shared/`           |
+| Server SQL operations    | `packages/loot-core/src/server/db/`        |
+| Transaction rules        | `packages/loot-core/src/server/rules/`     |
+| Recurring schedules      | `packages/loot-core/src/server/schedules/` |
+| React pages / screens    | `packages/desktop-client/src/components/`  |
+| Custom React hooks       | `packages/desktop-client/src/hooks/`       |
+| Redux slices             | `packages/desktop-client/src/redux/`       |
+| Shared UI components     | `packages/component-library/src/`          |
+| Server HTTP routes       | `packages/sync-server/src/app-*.{js,ts}`   |
+| Server DB helpers        | `packages/sync-server/src/account-db.js`   |
+| Server DB migrations     | `packages/sync-server/migrations/`         |
+| Server configuration     | `packages/sync-server/src/load-config.js`  |
 
 ---
 
@@ -137,17 +137,27 @@ const config = { port: 5006 } satisfies ServerConfig;
 
 ```tsx
 // ✅ Named exports; type props directly
-export function MyComponent({ title, amount }: { title: string; amount: number }) {
-  return <div>{title}: {amount}</div>;
+export function MyComponent({
+  title,
+  amount,
+}: {
+  title: string;
+  amount: number;
+}) {
+  return (
+    <div>
+      {title}: {amount}
+    </div>
+  );
 }
 
 // ✅ Use project wrappers, not the library directly
-import { useNavigate } from '../hooks/useNavigate';           // not react-router
-import { useDispatch, useSelector } from '../redux';          // not react-redux
+import { useNavigate } from '../hooks/useNavigate'; // not react-router
+import { useDispatch, useSelector } from '../redux'; // not react-redux
 
 // ✅ Wrap all user-facing strings for i18n
 import { t } from '../i18n';
-<button>{t('Save')}</button>
+<button>{t('Save')}</button>;
 
 // ❌ No React.FC / React.FunctionComponent
 // ❌ No default exports for components

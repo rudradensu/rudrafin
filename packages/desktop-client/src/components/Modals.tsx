@@ -65,6 +65,7 @@ import { PluggyAiInitialiseModal } from './modals/PluggyAiInitialiseModal';
 import { ScheduledTransactionMenuModal } from './modals/ScheduledTransactionMenuModal';
 import { SelectLinkedAccountsModal } from './modals/SelectLinkedAccountsModal';
 import { SimpleFinInitialiseModal } from './modals/SimpleFinInitialiseModal';
+import { TagAutocompleteModal } from './modals/TagAutocompleteModal';
 import { TrackingBalanceMenuModal } from './modals/TrackingBalanceMenuModal';
 import { TrackingBudgetMenuModal } from './modals/TrackingBudgetMenuModal';
 import { TrackingBudgetMonthMenuModal } from './modals/TrackingBudgetMonthMenuModal';
@@ -221,6 +222,9 @@ export function Modals() {
 
         case 'payee-autocomplete':
           return <PayeeAutocompleteModal key={key} {...modal.options} />;
+
+        case 'tag-autocomplete':
+          return <TagAutocompleteModal key={key} {...modal.options} />;
 
         case 'payee-category-learning':
           return <CategoryLearning key={key} />;
