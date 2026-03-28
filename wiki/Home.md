@@ -17,6 +17,7 @@ documentation for every aspect of contributing to and deploying the project.
 | [Testing](./06-testing.md)                                    | Running tests and generating test data                  |
 | [Container Deployment](./07-container-deploy.md)              | Building and deploying Docker containers                |
 | [Production Operations](./08-production.md)                   | Starting, updating, monitoring, and backing up          |
+| [Tag Popup — TypeScript Walkthrough](./09-tag-popup-typescript-walkthrough.md) | Plain-English tour of the tag selection feature with TypeScript concept callouts |
 
 ---
 
