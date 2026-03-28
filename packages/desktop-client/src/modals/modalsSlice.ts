@@ -269,6 +269,13 @@ export type Modal =
       };
     }
   | {
+      name: 'tag-autocomplete';
+      options: {
+        onSelect: (tag: string) => void;
+        onClose?: () => void;
+      };
+    }
+  | {
       name: 'budget-summary';
       options: {
         month: string;

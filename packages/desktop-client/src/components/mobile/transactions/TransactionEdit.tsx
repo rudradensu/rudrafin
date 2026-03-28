@@ -16,6 +16,7 @@ import {
   SvgAdd,
   SvgLocation,
   SvgPiggyBank,
+  SvgTag,
   SvgTrash,
 } from '@actual-app/components/icons/v1';
 import { SvgPencilWriteAlternate } from '@actual-app/components/icons/v2';
@@ -398,9 +399,30 @@ const ChildTransactionEdit = forwardRef<
     ref,
   ) => {
     const { t } = useTranslation();
+    const dispatch = useDispatch();
     const { editingField, onRequestActiveEdit, onClearActiveEdit } =
       useSingleActiveEditForm()!;
     const [hideFraction, _] = useSyncedPref('hideFraction');
+    const [notesInputKey, setNotesInputKey] = useState(0);
+
+    function onOpenTagModal() {
+      dispatch(
+        pushModal({
+          modal: {
+            name: 'tag-autocomplete',
+            options: {
+              onSelect: tag => {
+                const newNotes = (transaction.notes || '').trim()
+                  ? `${transaction.notes} ${tag}`
+                  : tag;
+                onUpdate(transaction, 'notes', newNotes);
+                setNotesInputKey(k => k + 1);
+              },
+            },
+          },
+        }),
+      );
+    }
 
     const prettyPayee = getPrettyPayee({
       t,
@@ -495,8 +517,26 @@ const ChildTransactionEdit = forwardRef<
         </View>
 
         <View>
-          <FieldLabel title={t('Notes')} />
+          <View
+            style={{
+              flexDirection: 'row',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              paddingRight: styles.mobileEditingPadding,
+            }}
+          >
+            <FieldLabel title={t('Notes')} style={{ marginTop: 25 }} />
+            <Button
+              variant="bare"
+              aria-label={t('Select tag')}
+              style={{ padding: '0 4px', marginTop: 20 }}
+              onPress={onOpenTagModal}
+            >
+              <SvgTag width={14} height={14} style={{ marginRight: 3 }} />
+            </Button>
+          </View>
           <InputField
+            key={notesInputKey}
             disabled={
               !!editingField &&
               editingField !== getFieldName(transaction.id, 'notes')
@@ -618,6 +658,7 @@ const TransactionEditInner = memo<TransactionEditInnerProps>(
       // total amount field. Hence we should not focus on it on page render.
       !Platform.isIOSAgent,
     );
+    const [mainNotesInputKey, setMainNotesInputKey] = useState(0);
     const childTransactionElementRefMap = useRef<
       Record<TransactionEntity['id'], HTMLDivElement | null>
     >({});
@@ -810,6 +851,28 @@ const TransactionEditInner = memo<TransactionEditInnerProps>(
         }
       },
       [onClearActiveEdit, onUpdate],
+    );
+
+    const onOpenTagModal = useCallback(
+      (currentNotes: string) => {
+        dispatch(
+          pushModal({
+            modal: {
+              name: 'tag-autocomplete',
+              options: {
+                onSelect: tag => {
+                  const newNotes = currentNotes.trim()
+                    ? `${currentNotes} ${tag}`
+                    : tag;
+                  void onUpdateInner(transaction, 'notes', newNotes);
+                  setMainNotesInputKey(k => k + 1);
+                },
+              },
+            },
+          }),
+        );
+      },
+      [dispatch, transaction, onUpdateInner],
     );
 
     const onTotalAmountUpdate = useCallback(
@@ -1299,8 +1362,26 @@ const TransactionEditInner = memo<TransactionEditInnerProps>(
           </View>
 
           <View>
-            <FieldLabel title={t('Notes')} />
+            <View
+              style={{
+                flexDirection: 'row',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                paddingRight: styles.mobileEditingPadding,
+              }}
+            >
+              <FieldLabel title={t('Notes')} />
+              <Button
+                variant="bare"
+                aria-label={t('Select tag')}
+                style={{ padding: '0 4px', marginTop: 20 }}
+                onPress={() => onOpenTagModal(transaction.notes || '')}
+              >
+                <SvgTag width={14} height={14} style={{ marginRight: 3 }} />
+              </Button>
+            </View>
             <InputField
+              key={mainNotesInputKey}
               disabled={
                 !!editingField &&
                 editingField !== getFieldName(transaction.id, 'notes')

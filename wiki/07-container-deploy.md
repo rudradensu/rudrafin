@@ -42,7 +42,7 @@ docker run -d \
 
 ## Option B — Two-container Docker Compose (recommended for production)
 
-Separates the database volume from the application process.  Benefits:
+Separates the database volume from the application process. Benefits:
 
 - Back up the database by exec-ing into the `actual-db` container.
 - Upgrade the application without touching the data volume.
@@ -78,10 +78,10 @@ Full list of options: <https://actualbudget.org/docs/config/>
 
 ### What the compose file creates
 
-| Service | Image | Purpose |
-|---|---|---|
-| `actual-db` | `alpine:3.22` | Owns the `actual-db-data` named volume; runs a sleep loop so you can exec in for backups |
-| `actual-server` | `actualbudget/actual-server:latest` | The Actual Budget sync server; mounts the volume from `actual-db` |
+| Service         | Image                               | Purpose                                                                                  |
+| --------------- | ----------------------------------- | ---------------------------------------------------------------------------------------- |
+| `actual-db`     | `alpine:3.22`                       | Owns the `actual-db-data` named volume; runs a sleep loop so you can exec in for backups |
+| `actual-server` | `actualbudget/actual-server:latest` | The Actual Budget sync server; mounts the volume from `actual-db`                        |
 
 The `actual-server` service waits for `actual-db` to report healthy before
 starting (using `depends_on: condition: service_healthy`).
@@ -102,7 +102,7 @@ Both container options mount a volume at `/data` inside the container:
         └── <budget-id>.sqlite
 ```
 
-**Always map `/data` to persistent storage.**  Containers are ephemeral;
+**Always map `/data` to persistent storage.** Containers are ephemeral;
 everything inside `/data` must survive container restarts and upgrades.
 
 ---
@@ -126,7 +126,7 @@ docker run -d \
 ### Option 2 — TLS at a reverse proxy (recommended)
 
 Terminate TLS at an nginx, Caddy, or Traefik reverse proxy and forward plain
-HTTP to the container.  Example Caddy configuration:
+HTTP to the container. Example Caddy configuration:
 
 ```
 actual.example.com {
@@ -140,10 +140,10 @@ Caddy automatically obtains and renews a Let's Encrypt certificate.
 
 ## Docker Hub image tags
 
-| Tag | Description |
-|---|---|
-| `latest` | Latest stable release |
-| `edge` | Built from the latest `master` commit |
+| Tag      | Description                                      |
+| -------- | ------------------------------------------------ |
+| `latest` | Latest stable release                            |
+| `edge`   | Built from the latest `master` commit            |
 | `25.x.x` | Pinned version tags for reproducible deployments |
 
 ---

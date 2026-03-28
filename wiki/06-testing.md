@@ -6,13 +6,13 @@
 
 ## Test overview
 
-| Layer | Framework | Location | Run command |
-|---|---|---|---|
-| Unit | Vitest | Alongside source (`*.test.ts`) | `yarn test` |
-| E2E (browser) | Playwright | `packages/desktop-client/e2e/` | `yarn e2e` |
-| E2E (Electron) | Playwright | `packages/desktop-electron/e2e/` | `yarn e2e:desktop` |
-| Visual regression | Playwright | `*-snapshots/` dirs | `yarn vrt` |
-| Sync-server integration | Vitest + supertest | `packages/sync-server/src/*.test.*` | see below |
+| Layer                   | Framework          | Location                            | Run command        |
+| ----------------------- | ------------------ | ----------------------------------- | ------------------ |
+| Unit                    | Vitest             | Alongside source (`*.test.ts`)      | `yarn test`        |
+| E2E (browser)           | Playwright         | `packages/desktop-client/e2e/`      | `yarn e2e`         |
+| E2E (Electron)          | Playwright         | `packages/desktop-electron/e2e/`    | `yarn e2e:desktop` |
+| Visual regression       | Playwright         | `*-snapshots/` dirs                 | `yarn vrt`         |
+| Sync-server integration | Vitest + supertest | `packages/sync-server/src/*.test.*` | see below          |
 
 ---
 
@@ -124,7 +124,7 @@ yarn workspace @actual-app/sync-server run test
 ```
 
 These tests use **Vitest + supertest** and run against a temporary in-memory
-SQLite database.  Database migrations are applied automatically before each
+SQLite database. Database migrations are applied automatically before each
 test run via `packages/sync-server/vitest.globalSetup.js`.
 
 ---
@@ -134,14 +134,14 @@ test run via `packages/sync-server/vitest.globalSetup.js`.
 ### Unit tests — inline fixtures
 
 Unit tests construct only the minimal state they need, defined directly in the
-test file.  There is no shared fixture database.
+test file. There is no shared fixture database.
 
 ```typescript
 // Example: loot-core unit test
 it('splits a transaction correctly', () => {
   const transaction = {
     id: 'tx1',
-    amount: -5000,  // $50.00 in cents
+    amount: -5000, // $50.00 in cents
     payee: 'Grocery Store',
   };
   const result = splitTransaction(transaction, [2000, 3000]);
@@ -152,7 +152,7 @@ it('splits a transaction correctly', () => {
 ### E2E tests — demo budget
 
 E2E tests start from a **demo budget** seeded by `loot-core`'s built-in demo
-generator.  The Playwright `globalSetup` hook (defined in
+generator. The Playwright `globalSetup` hook (defined in
 `packages/desktop-client/playwright.config.ts`) navigates to the UI, selects
 "View demo", and waits for the budget to load before any test begins.
 
@@ -166,8 +166,8 @@ The demo budget contains:
 ### Sync-server tests — temporary SQLite
 
 The sync-server test runner creates a fresh SQLite database in a temp
-directory before each test suite.  After the suite finishes the database is
-deleted.  Tests do not share state across files.
+directory before each test suite. After the suite finishes the database is
+deleted. Tests do not share state across files.
 
 ---
 
@@ -197,7 +197,7 @@ describe('myFunction', () => {
 
 ### E2E test (Playwright)
 
-Add a `.test.ts` file in `packages/desktop-client/e2e/`.  Reuse page-object
+Add a `.test.ts` file in `packages/desktop-client/e2e/`. Reuse page-object
 models from `e2e/page-models/` for common interactions.
 
 ```typescript
@@ -267,14 +267,14 @@ yarn workspace @actual-app/web run playwright test \
 
 ## Test configuration reference
 
-| File | Purpose |
-|---|---|
-| `vitest.config.ts` (root) | Root Vitest config (Node environment) |
-| `packages/loot-core/vitest.config.ts` | loot-core unit test config |
-| `packages/sync-server/vitest.config.ts` | sync-server unit test config |
-| `packages/desktop-client/vitest.web.config.ts` | Browser-environment unit tests |
-| `packages/desktop-client/playwright.config.ts` | Playwright E2E and VRT config |
-| `lage.config.js` | Lage pipeline (caching + parallelism) |
+| File                                           | Purpose                               |
+| ---------------------------------------------- | ------------------------------------- |
+| `vitest.config.ts` (root)                      | Root Vitest config (Node environment) |
+| `packages/loot-core/vitest.config.ts`          | loot-core unit test config            |
+| `packages/sync-server/vitest.config.ts`        | sync-server unit test config          |
+| `packages/desktop-client/vitest.web.config.ts` | Browser-environment unit tests        |
+| `packages/desktop-client/playwright.config.ts` | Playwright E2E and VRT config         |
+| `lage.config.js`                               | Lage pipeline (caching + parallelism) |
 
 ---
 

@@ -29,7 +29,7 @@ services:
     command: sh -c "mkdir -p /data/server-files /data/user-files && while true; do sleep 86400; done"
     restart: unless-stopped
     healthcheck:
-      test: ["CMD-SHELL", "test -d /data"]
+      test: ['CMD-SHELL', 'test -d /data']
       interval: 30s
       timeout: 5s
       retries: 3

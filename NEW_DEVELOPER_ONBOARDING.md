@@ -30,37 +30,37 @@ See also:
 
 ## 1. Project overview and technologies
 
-Actual Budget is a **local-first personal finance application**.  All budget
-data is stored in a SQLite database on the user's device.  An optional
+Actual Budget is a **local-first personal finance application**. All budget
+data is stored in a SQLite database on the user's device. An optional
 **sync server** lets multiple devices share changes through CRDT-based
 synchronization — without the server ever seeing the unencrypted budget
 contents.
 
 ### Technology stack
 
-| Layer | Technology | Learn more |
-|---|---|---|
-| **Language** | TypeScript 5 (strict mode) | [typescriptlang.org](https://www.typescriptlang.org/docs/) |
-| **Frontend** | React 18 + React Compiler | [react.dev](https://react.dev/) |
-| **Build tool (frontend)** | Vite | [vitejs.dev](https://vitejs.dev/) |
-| **Desktop wrapper** | Electron | [electronjs.org](https://www.electronjs.org/docs/latest) |
-| **Backend / sync server** | Node.js + Express | [expressjs.com](https://expressjs.com/) |
-| **Database (budget)** | SQLite via `better-sqlite3` | [better-sqlite3 docs](https://github.com/WiseLibs/better-sqlite3/blob/master/docs/api.md) |
-| **Database (server)** | SQLite via `better-sqlite3` | Same |
-| **Sync protocol** | CRDT (Conflict-free Replicated Data Type) | [crdt.tech](https://crdt.tech/) |
-| **Monorepo tooling** | Yarn 4 workspaces + Lage | [yarnpkg.com](https://yarnpkg.com/), [microsoft.github.io/lage](https://microsoft.github.io/lage/) |
-| **Unit testing** | Vitest | [vitest.dev](https://vitest.dev/) |
-| **End-to-end testing** | Playwright | [playwright.dev](https://playwright.dev/) |
-| **Linting / formatting** | oxlint + oxfmt | [oxc.rs](https://oxc.rs/) |
-| **Type checking** | TypeScript native (`tsgo`) + lage | [TypeScript docs](https://www.typescriptlang.org/) |
-| **Containerization** | Docker + Docker Compose | [docs.docker.com](https://docs.docker.com/) |
-| **CI/CD** | GitHub Actions | [docs.github.com/actions](https://docs.github.com/en/actions) |
+| Layer                     | Technology                                | Learn more                                                                                         |
+| ------------------------- | ----------------------------------------- | -------------------------------------------------------------------------------------------------- |
+| **Language**              | TypeScript 5 (strict mode)                | [typescriptlang.org](https://www.typescriptlang.org/docs/)                                         |
+| **Frontend**              | React 18 + React Compiler                 | [react.dev](https://react.dev/)                                                                    |
+| **Build tool (frontend)** | Vite                                      | [vitejs.dev](https://vitejs.dev/)                                                                  |
+| **Desktop wrapper**       | Electron                                  | [electronjs.org](https://www.electronjs.org/docs/latest)                                           |
+| **Backend / sync server** | Node.js + Express                         | [expressjs.com](https://expressjs.com/)                                                            |
+| **Database (budget)**     | SQLite via `better-sqlite3`               | [better-sqlite3 docs](https://github.com/WiseLibs/better-sqlite3/blob/master/docs/api.md)          |
+| **Database (server)**     | SQLite via `better-sqlite3`               | Same                                                                                               |
+| **Sync protocol**         | CRDT (Conflict-free Replicated Data Type) | [crdt.tech](https://crdt.tech/)                                                                    |
+| **Monorepo tooling**      | Yarn 4 workspaces + Lage                  | [yarnpkg.com](https://yarnpkg.com/), [microsoft.github.io/lage](https://microsoft.github.io/lage/) |
+| **Unit testing**          | Vitest                                    | [vitest.dev](https://vitest.dev/)                                                                  |
+| **End-to-end testing**    | Playwright                                | [playwright.dev](https://playwright.dev/)                                                          |
+| **Linting / formatting**  | oxlint + oxfmt                            | [oxc.rs](https://oxc.rs/)                                                                          |
+| **Type checking**         | TypeScript native (`tsgo`) + lage         | [TypeScript docs](https://www.typescriptlang.org/)                                                 |
+| **Containerization**      | Docker + Docker Compose                   | [docs.docker.com](https://docs.docker.com/)                                                        |
+| **CI/CD**                 | GitHub Actions                            | [docs.github.com/actions](https://docs.github.com/en/actions)                                      |
 
 ---
 
 ## 2. Code and files layout
 
-The repository is a **Yarn workspace monorepo**.  All packages live under
+The repository is a **Yarn workspace monorepo**. All packages live under
 `packages/`.
 
 ```
@@ -98,7 +98,7 @@ actual/
 
 #### `loot-core` (`@actual-app/core`)
 
-The heart of the application.  Contains:
+The heart of the application. Contains:
 
 - **Budget calculations** — envelope budget math, rollover logic
 - **Shared types** — TypeScript types used by every other package
@@ -118,7 +118,7 @@ packages/loot-core/src/
 
 #### `desktop-client` (`@actual-app/web`)
 
-The React UI.  Runs in the browser and inside Electron.
+The React UI. Runs in the browser and inside Electron.
 
 ```
 packages/desktop-client/src/
@@ -157,7 +157,7 @@ packages/sync-server/src/
 #### `component-library` (`@actual-app/components`)
 
 Shared design-system components (`Button`, `Input`, `Menu`, `Select`, …) and
-375+ SVG icon components.  Do not import these icons manually — they are
+375+ SVG icon components. Do not import these icons manually — they are
 auto-generated.
 
 ---
@@ -241,16 +241,16 @@ modal is open, the current theme, session info) lives in Redux.
 
 ### 3d. Sync server HTTP routes
 
-| Route prefix | Handler file | Purpose |
-|---|---|---|
-| `/sync` | `app-sync.ts` | Budget file upload/download and sync |
-| `/account` | `app-account.js` | User registration, login, password |
-| `/admin` | `app-admin.js` | Admin dashboard |
-| `/openid` | `app-openid.js` | OpenID Connect SSO |
-| `/gocardless` | `app-gocardless/` | GoCardless bank import |
-| `/simplefin` | `app-simplefin/` | SimpleFin bank import |
-| `/pluggyai` | `app-pluggyai/` | Pluggy.ai bank import |
-| `/secret` | `app-secrets.js` | Encrypted secrets (API keys) |
+| Route prefix  | Handler file      | Purpose                              |
+| ------------- | ----------------- | ------------------------------------ |
+| `/sync`       | `app-sync.ts`     | Budget file upload/download and sync |
+| `/account`    | `app-account.js`  | User registration, login, password   |
+| `/admin`      | `app-admin.js`    | Admin dashboard                      |
+| `/openid`     | `app-openid.js`   | OpenID Connect SSO                   |
+| `/gocardless` | `app-gocardless/` | GoCardless bank import               |
+| `/simplefin`  | `app-simplefin/`  | SimpleFin bank import                |
+| `/pluggyai`   | `app-pluggyai/`   | Pluggy.ai bank import                |
+| `/secret`     | `app-secrets.js`  | Encrypted secrets (API keys)         |
 
 ---
 
@@ -258,12 +258,12 @@ modal is open, the current theme, session info) lives in Redux.
 
 ### Prerequisites
 
-| Tool | Version | Install |
-|---|---|---|
-| Node.js | ≥ 22 | [nodejs.org](https://nodejs.org/) or `nvm install 22` |
-| Yarn | ^4.9.1 | `corepack enable && yarn --version` |
-| Git | any recent | [git-scm.com](https://git-scm.com/) |
-| Docker (optional) | 24+ | [docs.docker.com/get-docker](https://docs.docker.com/get-docker/) |
+| Tool              | Version    | Install                                                           |
+| ----------------- | ---------- | ----------------------------------------------------------------- |
+| Node.js           | ≥ 22       | [nodejs.org](https://nodejs.org/) or `nvm install 22`             |
+| Yarn              | ^4.9.1     | `corepack enable && yarn --version`                               |
+| Git               | any recent | [git-scm.com](https://git-scm.com/)                               |
+| Docker (optional) | 24+        | [docs.docker.com/get-docker](https://docs.docker.com/get-docker/) |
 
 ### Initial setup
 
@@ -323,15 +323,15 @@ git commit -m "fix: correct budget rollover calculation"
 
 ### Where to look for specific areas
 
-| What you want to change | Starting point |
-|---|---|
-| Budget calculations | `packages/loot-core/src/shared/` |
-| Server API routes | `packages/sync-server/src/app-*.{js,ts}` |
-| React pages / screens | `packages/desktop-client/src/components/` |
-| Custom React hooks | `packages/desktop-client/src/hooks/` |
-| Shared UI components | `packages/component-library/src/` |
+| What you want to change      | Starting point                                                         |
+| ---------------------------- | ---------------------------------------------------------------------- |
+| Budget calculations          | `packages/loot-core/src/shared/`                                       |
+| Server API routes            | `packages/sync-server/src/app-*.{js,ts}`                               |
+| React pages / screens        | `packages/desktop-client/src/components/`                              |
+| Custom React hooks           | `packages/desktop-client/src/hooks/`                                   |
+| Shared UI components         | `packages/component-library/src/`                                      |
 | Database schema / migrations | `packages/sync-server/src/sql/` and `packages/sync-server/migrations/` |
-| Server configuration options | `packages/sync-server/src/load-config.js` |
+| Server configuration options | `packages/sync-server/src/load-config.js`                              |
 
 ### Code conventions (quick reference)
 
@@ -381,7 +381,7 @@ The `sync-server.Dockerfile` uses a **multi-stage build**:
 
 1. **`deps` stage** — installs all yarn dependencies.
 2. **`builder` stage** — runs `yarn build:server` (browser bundle + server
-   TypeScript compilation).  The `NODE_OPTIONS=--max_old_space_size=8192`
+   TypeScript compilation). The `NODE_OPTIONS=--max_old_space_size=8192`
    variable is set because the browser bundle is large.
 3. **`prod` stage** — copies only built artifacts and production `node_modules`
    into a slim `node:22-bookworm-slim` image, running as a non-root user
@@ -391,14 +391,14 @@ The `sync-server.Dockerfile` uses a **multi-stage build**:
 
 GitHub Actions runs on every PR and `master` merge.
 
-| Workflow file | Triggers | What it does |
-|---|---|---|
-| `.github/workflows/check.yml` | Push / PR | typecheck, lint, unit tests, E2E tests |
-| `.github/workflows/build.yml` | Push / PR | Verifies the production Docker build |
-| `.github/workflows/docker-release.yml` | Release tag | Builds and pushes `actualbudget/actual-server` to Docker Hub |
-| `.github/workflows/docker-edge.yml` | `master` push | Builds and pushes the `edge` tag |
-| `.github/workflows/electron-master.yml` | `master` push | Builds the Electron desktop binaries |
-| `.github/workflows/e2e-test.yml` | PR | Runs Playwright E2E tests |
+| Workflow file                           | Triggers      | What it does                                                 |
+| --------------------------------------- | ------------- | ------------------------------------------------------------ |
+| `.github/workflows/check.yml`           | Push / PR     | typecheck, lint, unit tests, E2E tests                       |
+| `.github/workflows/build.yml`           | Push / PR     | Verifies the production Docker build                         |
+| `.github/workflows/docker-release.yml`  | Release tag   | Builds and pushes `actualbudget/actual-server` to Docker Hub |
+| `.github/workflows/docker-edge.yml`     | `master` push | Builds and pushes the `edge` tag                             |
+| `.github/workflows/electron-master.yml` | `master` push | Builds the Electron desktop binaries                         |
+| `.github/workflows/e2e-test.yml`        | PR            | Runs Playwright E2E tests                                    |
 
 All checks must pass before a PR can be merged.
 
@@ -407,14 +407,14 @@ All checks must pass before a PR can be merged.
 All server configuration is loaded through `packages/sync-server/src/load-config.js`.
 The most common options:
 
-| Variable | Default | Description |
-|---|---|---|
-| `ACTUAL_PORT` | `5006` | Port the server listens on |
-| `ACTUAL_DATA_DIR` | `/data` | Where SQLite files are stored |
-| `ACTUAL_HTTPS_KEY` | — | Path to TLS private key |
-| `ACTUAL_HTTPS_CERT` | — | Path to TLS certificate |
-| `ACTUAL_UPLOAD_FILE_SIZE_LIMIT_MB` | `20` | Max file upload size |
-| `ACTUAL_LOGIN_METHOD` | `password` | Auth method (`password`, `header`, `openid`) |
+| Variable                           | Default    | Description                                  |
+| ---------------------------------- | ---------- | -------------------------------------------- |
+| `ACTUAL_PORT`                      | `5006`     | Port the server listens on                   |
+| `ACTUAL_DATA_DIR`                  | `/data`    | Where SQLite files are stored                |
+| `ACTUAL_HTTPS_KEY`                 | —          | Path to TLS private key                      |
+| `ACTUAL_HTTPS_CERT`                | —          | Path to TLS certificate                      |
+| `ACTUAL_UPLOAD_FILE_SIZE_LIMIT_MB` | `20`       | Max file upload size                         |
+| `ACTUAL_LOGIN_METHOD`              | `password` | Auth method (`password`, `header`, `openid`) |
 
 Full list: <https://actualbudget.org/docs/config/>
 
@@ -468,7 +468,7 @@ needs.
 #### E2E tests — demo budget
 
 E2E tests create a fresh budget at the start of each test run using the
-**"View demo"** path, which calls `loot-core`'s demo-budget generator.  This
+**"View demo"** path, which calls `loot-core`'s demo-budget generator. This
 produces a realistic budget with:
 
 - Multiple accounts (checking, savings, credit cards)
@@ -483,7 +483,7 @@ by the Playwright `globalSetup` hook defined in
 #### Sync-server integration tests
 
 The sync-server uses **Vitest + supertest** against a temporary in-memory
-SQLite database.  Schema migrations are applied automatically before each test
+SQLite database. Schema migrations are applied automatically before each test
 run via `packages/sync-server/vitest.globalSetup.js`.
 
 ### Writing new tests
@@ -538,7 +538,7 @@ Vitest and Playwright both print a summary to the terminal after each run:
 ### Playwright HTML report
 
 After an E2E test run an HTML report is generated at
-`packages/desktop-client/playwright-report/index.html`.  Open it in a browser
+`packages/desktop-client/playwright-report/index.html`. Open it in a browser
 for a full visual breakdown including screenshots and step-by-step traces:
 
 ```bash
@@ -576,7 +576,7 @@ When a visual regression test fails Playwright saves:
 - `diff.png` — the highlighted pixel differences
 
 All three files appear in `packages/desktop-client/test-results/` and in the
-CI artifacts.  If the difference is intentional, update the baselines:
+CI artifacts. If the difference is intentional, update the baselines:
 
 ```bash
 yarn workspace @actual-app/web run playwright test --update-snapshots
@@ -626,12 +626,12 @@ docker compose up -d
 The compose file creates:
 
 - **`actual-db`** — an Alpine container that owns the `actual-db-data` volume
-  (holds all SQLite files).  You can exec into this container to run backups.
+  (holds all SQLite files). You can exec into this container to run backups.
 - **`actual-server`** — the Actual Budget server, mounting the same volume.
 
 ### Persisting data
 
-Both options mount a volume at `/data` inside the container.  This directory
+Both options mount a volume at `/data` inside the container. This directory
 contains:
 
 ```
@@ -640,7 +640,7 @@ contains:
 └── user-files/     # encrypted budget files (one directory per user)
 ```
 
-**Always map `/data` to a persistent host volume or named volume.**  Losing
+**Always map `/data` to a persistent host volume or named volume.** Losing
 `/data` means losing all budget files.
 
 ---
@@ -708,7 +708,7 @@ docker run --rm \
 ### Setting a password
 
 On the first visit to **http://\<host\>:5006** you will be prompted to create
-a server password.  To reset it:
+a server password. To reset it:
 
 ```bash
 # For the published image
@@ -736,11 +736,11 @@ actual.example.com {
 
 ## Next steps
 
-| Resource | Description |
-|---|---|
-| [DEVELOPER_GUIDE.md](./DEVELOPER_GUIDE.md) | Full contributor workflow reference |
-| [TESTING_GUIDE.md](./TESTING_GUIDE.md) | Complete test-running and test-writing reference |
-| [INSTALLATION.md](./INSTALLATION.md) | All deployment options and configuration |
-| [Community documentation](https://actualbudget.org/docs) | User and developer documentation |
-| [Discord](https://discord.gg/pRYNYr4W5A) | Get help from the community |
-| [wiki/](./wiki/) | Deep-dive pages for each topic |
+| Resource                                                 | Description                                      |
+| -------------------------------------------------------- | ------------------------------------------------ |
+| [DEVELOPER_GUIDE.md](./DEVELOPER_GUIDE.md)               | Full contributor workflow reference              |
+| [TESTING_GUIDE.md](./TESTING_GUIDE.md)                   | Complete test-running and test-writing reference |
+| [INSTALLATION.md](./INSTALLATION.md)                     | All deployment options and configuration         |
+| [Community documentation](https://actualbudget.org/docs) | User and developer documentation                 |
+| [Discord](https://discord.gg/pRYNYr4W5A)                 | Get help from the community                      |
+| [wiki/](./wiki/)                                         | Deep-dive pages for each topic                   |

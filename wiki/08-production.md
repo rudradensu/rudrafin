@@ -28,7 +28,7 @@ The application is available at **http://\<host\>:5006**.
 
 ## Verifying the installation
 
-Open **http://\<host\>:5006** in a browser.  You should see the Actual Budget
+Open **http://\<host\>:5006** in a browser. You should see the Actual Budget
 setup / login screen.
 
 Or check via the HTTP info endpoint:
@@ -43,7 +43,7 @@ curl http://localhost:5006/info
 ## Setting a password
 
 On the first visit to **http://\<host\>:5006** you are prompted to choose a
-server password.  This password protects access to all budget files.
+server password. This password protects access to all budget files.
 
 ### Resetting a forgotten password
 
@@ -213,15 +213,15 @@ actual.example.com {
 
 ## Environment variable quick reference
 
-| Variable | Default | Description |
-|---|---|---|
-| `ACTUAL_PORT` | `5006` | Port to listen on |
-| `ACTUAL_DATA_DIR` | `/data` | Data directory for SQLite files |
-| `ACTUAL_HTTPS_KEY` | — | TLS private key path |
-| `ACTUAL_HTTPS_CERT` | — | TLS certificate path |
-| `ACTUAL_UPLOAD_FILE_SIZE_LIMIT_MB` | `20` | Max upload size (MB) |
-| `ACTUAL_LOGIN_METHOD` | `password` | Auth: `password`, `header`, or `openid` |
-| `ACTUAL_TRUSTED_PROXIES` | — | Comma-separated trusted proxy IPs |
+| Variable                           | Default    | Description                             |
+| ---------------------------------- | ---------- | --------------------------------------- |
+| `ACTUAL_PORT`                      | `5006`     | Port to listen on                       |
+| `ACTUAL_DATA_DIR`                  | `/data`    | Data directory for SQLite files         |
+| `ACTUAL_HTTPS_KEY`                 | —          | TLS private key path                    |
+| `ACTUAL_HTTPS_CERT`                | —          | TLS certificate path                    |
+| `ACTUAL_UPLOAD_FILE_SIZE_LIMIT_MB` | `20`       | Max upload size (MB)                    |
+| `ACTUAL_LOGIN_METHOD`              | `password` | Auth: `password`, `header`, or `openid` |
+| `ACTUAL_TRUSTED_PROXIES`           | —          | Comma-separated trusted proxy IPs       |
 
 Full reference: <https://actualbudget.org/docs/config/>
 
@@ -231,10 +231,10 @@ Full reference: <https://actualbudget.org/docs/config/>
 
 If you prefer not to self-host:
 
-| Provider | Notes |
-|---|---|
-| [PikaPods](https://www.pikapods.com/pods?run=actual) | One-click setup, ~$1.40/month |
-| [Fly.io](https://actualbudget.org/docs/install/fly) | ~$1.50/month, detailed guide available |
+| Provider                                             | Notes                                  |
+| ---------------------------------------------------- | -------------------------------------- |
+| [PikaPods](https://www.pikapods.com/pods?run=actual) | One-click setup, ~$1.40/month          |
+| [Fly.io](https://actualbudget.org/docs/install/fly)  | ~$1.50/month, detailed guide available |
 
 ---
 

@@ -40,30 +40,30 @@ actual/                          (repository root)
 
 ## Packages overview
 
-All packages are Yarn workspaces under `packages/`.  Run any command with:
+All packages are Yarn workspaces under `packages/`. Run any command with:
 
 ```bash
 yarn workspace <workspace-name> run <command>
 ```
 
-| Directory | Workspace name | Purpose |
-|---|---|---|
-| `loot-core` | `@actual-app/core` | All budget logic, SQLite, CRDT client |
-| `desktop-client` | `@actual-app/web` | React web/desktop UI |
-| `desktop-electron` | `desktop-electron` | Electron desktop wrapper |
-| `sync-server` | `@actual-app/sync-server` | Express sync + auth server |
-| `api` | `@actual-app/api` | Public Node.js scripting API |
-| `component-library` | `@actual-app/components` | Shared React design-system components |
-| `crdt` | `@actual-app/crdt` | CRDT protocol + Protobuf serialization |
-| `plugins-service` | `plugins-service` | Plugin worker (Web Worker / iframe sandbox) |
-| `eslint-plugin-actual` | `eslint-plugin-actual` | Custom ESLint rules for this codebase |
-| `docs` | `docs` | Docusaurus documentation website |
+| Directory              | Workspace name            | Purpose                                     |
+| ---------------------- | ------------------------- | ------------------------------------------- |
+| `loot-core`            | `@actual-app/core`        | All budget logic, SQLite, CRDT client       |
+| `desktop-client`       | `@actual-app/web`         | React web/desktop UI                        |
+| `desktop-electron`     | `desktop-electron`        | Electron desktop wrapper                    |
+| `sync-server`          | `@actual-app/sync-server` | Express sync + auth server                  |
+| `api`                  | `@actual-app/api`         | Public Node.js scripting API                |
+| `component-library`    | `@actual-app/components`  | Shared React design-system components       |
+| `crdt`                 | `@actual-app/crdt`        | CRDT protocol + Protobuf serialization      |
+| `plugins-service`      | `plugins-service`         | Plugin worker (Web Worker / iframe sandbox) |
+| `eslint-plugin-actual` | `eslint-plugin-actual`    | Custom ESLint rules for this codebase       |
+| `docs`                 | `docs`                    | Docusaurus documentation website            |
 
 ---
 
 ## `loot-core` in detail
 
-`loot-core` is the **platform-agnostic core**.  It runs in:
+`loot-core` is the **platform-agnostic core**. It runs in:
 
 - A Web Worker (browser)
 - The Electron main process (desktop)
@@ -181,14 +181,14 @@ packages/component-library/src/
 
 ## Configuration files at the root
 
-| File | Purpose |
-|---|---|
-| `package.json` | Root scripts (`yarn start`, `yarn test`, `yarn lint:fix`, …) |
-| `lage.config.js` | Lage pipeline — defines caching and task order |
-| `tsconfig.json` | TypeScript project references for all packages |
-| `vitest.config.ts` | Root Vitest config (Node environment default) |
-| `.editorconfig` | Editor formatting baseline |
-| `.yarnrc.yml` | Yarn 4 settings (plug-n-play mode, plugin config) |
+| File               | Purpose                                                      |
+| ------------------ | ------------------------------------------------------------ |
+| `package.json`     | Root scripts (`yarn start`, `yarn test`, `yarn lint:fix`, …) |
+| `lage.config.js`   | Lage pipeline — defines caching and task order               |
+| `tsconfig.json`    | TypeScript project references for all packages               |
+| `vitest.config.ts` | Root Vitest config (Node environment default)                |
+| `.editorconfig`    | Editor formatting baseline                                   |
+| `.yarnrc.yml`      | Yarn 4 settings (plug-n-play mode, plugin config)            |
 
 ---
 
